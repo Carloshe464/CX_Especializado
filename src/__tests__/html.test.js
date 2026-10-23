@@ -15,4 +15,3 @@ it('preserva idioma, título, fontes e entrada da aplicação', () => {
   expect(html).toContain('id="root"')
   expect(html).toContain('type="module" src="/src/main.jsx"')
 })
-

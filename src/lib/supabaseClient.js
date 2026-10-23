@@ -10,4 +10,3 @@ export const supabase = config.isConfigured
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   })
   : null
-

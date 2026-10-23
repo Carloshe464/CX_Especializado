@@ -39,4 +39,3 @@ describe('rotas provisórias', () => {
     expect(screen.getByRole('heading', { name: 'Painel' })).toBeInTheDocument()
   })
 })
-

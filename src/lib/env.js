@@ -39,4 +39,3 @@ export function readSupabaseEnv(source = import.meta.env) {
 
   return { url, key, isConfigured: true, error: null }
 }
-

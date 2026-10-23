@@ -56,4 +56,3 @@ describe('readSupabaseEnv', () => {
     expect(readSupabaseEnv({ ...publicConfig, VITE_SUPABASE_URL: 'https://usuario:senha@exemplo.test' }).isConfigured).toBe(false)
   })
 })
-

@@ -54,4 +54,3 @@ describe('tokens exatos da TASK-001', () => {
     expect(css).not.toMatch(/\.dark\b/)
   })
 })
-

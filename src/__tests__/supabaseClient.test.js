@@ -34,4 +34,3 @@ it('cria um único cliente configurado sem rede nem recuperação automática de
   expect(first.supabase.auth.detectSessionInUrl).toBe(false)
   expect(fetch).not.toHaveBeenCalled()
 })
-
