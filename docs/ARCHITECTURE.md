@@ -1,6 +1,6 @@
 # Arquitetura — Protocolo CX 1.1
 
-> Status: **proposta (Fase 0)**. Itens marcados *[pendente]* dependem de decisão do responsável ou do README-DEV de auditoria, ainda não disponível.
+> Status: **proposta (Fase 0)**. Itens marcados *[pendente]* dependem de decisão do responsável. **README-DEV** = `docs/reference/README-DEV_AUDITORIA_TECNICA.md`.
 > Referência de comportamento original: `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md` (citado como **REF §n**).
 
 ## 1. Visão geral
@@ -56,13 +56,16 @@ Bibliotecas: React 18, Vite, React Router v7 (modo declarativo, igual REF §3), 
 
 Rotas e guardas (REF §3): `/pesquisa/:token` e páginas de auth fora do layout; demais dentro de `ProtectedRoute` + `CxLayout`. `Dashboard`, `Curation`, `Satisfaction` exigem papel supervisor (redirecionamentos da REF preservados).
 
-## 3. Identidade e papéis
+## 3. Identidade, organizações e papéis (D-002, D-008, D-017)
 
-- Supabase Auth (e-mail/senha) substitui o auth do Base44. Telas `/login`, `/register`, `/forgot-password`, `/reset-password`.
-- Tabela `profiles` (1:1 com `auth.users`): `id`, `full_name`, `email`, `role` (`admin` = supervisor, `user` = analista), timestamps.
-- `role` **não pode ser alterado pelo próprio usuário** (RLS de update sem coluna `role` + trigger de proteção). Atribuição de papel só por supervisor via RPC auditada ou pelo painel Supabase.
-- Função SQL `public.is_supervisor()` (`SECURITY DEFINER`, `STABLE`, `search_path` fixo) usada pelas políticas.
-- *[pendente]* Cadastro aberto (`/register`) vs. somente convite — REF diz "convidar via plataforma" (§11.8). Proposta: registro cria sempre `role='user'`; avaliar desabilitar signup público (D-008).
+- Supabase Auth com **Google OAuth** e e-mail/senha, em cadastro aberto (self-service). Telas `/login`, `/register`, `/forgot-password`, `/reset-password`.
+- `profiles` (1:1 com `auth.users`): `id`, `full_name`, `email`, timestamps. **Sem papel.**
+- `organizations`: `id`, `name`, timestamps.
+- `memberships`: `user_id`, `organization_id`, `role` (`supervisor` | `analista`), com **uma organização por usuário** (único em `user_id`), exceto o admin da plataforma.
+- `platform_admins`: `user_id`; papel global, só gravável pelo banco/painel.
+- Funções `SECURITY DEFINER` (`STABLE`, `search_path` fixo): `current_org_id()`, `is_supervisor(org)`, `is_platform_admin()`, usadas por todas as políticas.
+- Papel e organização **nunca** vêm do cliente (SEC-03/SEC-04/SEC-18).
+- *[em aberto D-017]* fluxo de entrada: criar organização no cadastro (e virar supervisor), convite por link, ou domínio de e-mail.
 
 ## 4. Modelo de dados (rascunho — fixado na Fase 2)
 
@@ -70,8 +73,10 @@ Convenções: `id uuid pk default gen_random_uuid()`, `created_at`, `updated_at`
 
 | Tabela | Origem REF | Notas de desenho |
 |---|---|---|
-| `profiles` | gestão de usuários | papel controlado pelo servidor |
-| `evaluations` | §4.1 | `analyst_user_id` FK `profiles`; `status` (rascunho/transcrito/analisado/curado); `diagnosis_status` (pendente/aprovado/rejeitado); campos de diagnóstico da IA **movidos para `analysis_runs`** (D-010) ou protegidos por view; `protocol` com índice único normalizado *[pendente D-012]* |
+| `organizations`, `memberships`, `platform_admins`, `profiles` | gestão de usuários | §3 |
+| `analysis_feedback` | nova (D-011) | validação do analista e veredito do supervisor por diagnóstico/oportunidade; view `effective_feedback` |
+| `ai_provider_configs` | nova (D-009) | provedor, URL, modelo, referência ao segredo no Vault, **por organização** |
+| `evaluations` | §4.1 | `organization_id`; `analyst_user_id` FK `profiles` (analista escolhido pelo supervisor, D-013); `status` (rascunho/transcrito/analisado/curado); `diagnosis_status` (pendente/aprovado/rejeitado); campos de diagnóstico da IA **movidos para `analysis_runs`** (D-010) ou protegidos por view; `protocol` único por `(organization_id, lower(btrim(protocol)))` (D-012) |
 | `analysis_runs` | nova (correção #3) | uma linha por execução da IA: `prompt_version`, `model`, `status` (sucesso/falha), `raw_output` (jsonb), `trend`, `strengths`, `summary_feedback`, `uncertainties`, `error_code`. Reanálise cria nova execução; decisões de curadoria anteriores não são apagadas |
 | `evaluation_scores` | §4.2 | FK `evaluation_id`, `analysis_run_id`; `score numeric(4,2) null check 0..10`; `classification` derivada por função SQL (mesma regra de `scoreClassification`) |
 | `opportunities` | §4.3 | FK `analysis_run_id`; status de curadoria alterável **somente** por supervisor |
@@ -84,15 +89,18 @@ Convenções: `id uuid pk default gen_random_uuid()`, `created_at`, `updated_at`
 | `ai_failures` | nova (correção #8) | registro técnico sem PII: `evaluation_id`, `stage`, `error_code`, `prompt_version`, `model`, `created_at` |
 | `evaluation_files` | nova (correção #9) | metadados dos arquivos do Storage (`path`, `kind`, `evaluation_id`), permitindo limpeza de órfãos |
 
-**Organização única vs. multiempresa:** ver D-002. Proposta: organização única nesta fase, sem coluna `organization_id`, com caminho de migração documentado.
+**Multiempresa (D-002):** toda tabela de negócio tem `organization_id NOT NULL`; `app_settings` e `protocol_versions` também são por organização, com seed na criação da organização.
 
-### Visibilidade do diagnóstico (correção #1)
+### Visibilidade e validação (D-011 — substitui a correção #1)
+O analista lê a análise das **próprias** avaliações assim que pronta e grava validação apenas como ele mesmo; o supervisor lê tudo da organização e grava veredito que prevalece. Especificação: `docs/specs/VALIDACAO_E_CURADORIA.md`.
+
+Redação anterior (histórico):
 Analista lê `evaluations` próprias, mas **scores, oportunidades e diagnóstico** só quando `diagnosis_status = 'aprovado'`, e oportunidades só com status `aprovada`/`ajustada`. Implementado por RLS nas tabelas filhas (join com `evaluations`) e por separar os campos de diagnóstico da linha principal (`analysis_runs`), de modo que nenhuma consulta direta exponha conteúdo pendente.
 
-## 5. Curadoria
+## 5. Curadoria (veredito do supervisor)
 
 RPCs `decide_opportunity(opportunity_id, decision, note, adjusted_recommendation)` e `decide_diagnosis(evaluation_id, decision, review)`:
-- validam `is_supervisor()`;
+- validam `is_supervisor(org)` da organização da avaliação;
 - validam transições de estado permitidas;
 - gravam `curation_logs` na mesma transação.
 
@@ -102,9 +110,10 @@ Políticas de UPDATE diretas nas colunas de curadoria são negadas a todos os pa
 
 Pipeline na Edge Function `analyze-evaluation`, em módulos independentes do provedor:
 
+0. **Versão do protocolo:** V1.1 (linha de base, verbatim) e V1.2 (+ comunicação assertiva e rapport, D-019); versão ativa por organização.
 1. **Entrada:** carrega a transcrição (servidor), valida que o chamador pode analisar a avaliação. **Não carrega CSAT** (regra 4.5/§8).
 2. **Prompt versionado:** `PROTOCOL_PROMPT V1.1` verbatim (REF §6.2) armazenado em arquivo versionado + `protocol_versions`; `prompt_version` registrado na execução.
-3. **Adaptador de provedor:** interface `generateStructured({ prompt, schema, files? })`; modelo e chave via segredos (`AI_PROVIDER`, `AI_MODEL`, `AI_API_KEY`). *[pendente D-009: provedor]*
+3. **Adaptador de provedor:** interface `generateStructured({ prompt, schema, files? })`; provedor, URL, modelo e chave lidos de `ai_provider_configs` + Vault, configurados pela interface (D-009, `docs/specs/PROVEDOR_IA.md`).
 4. **Validação:** JSON Schema estrito (exatamente 6 competências, nomes exatos, `score` 0–10 ou `null`, enums de severidade/origem/confiança/tendência, oportunidades 0..n).
 5. **Normalização:** `normalizeTrend`, classificação, recorte de campos.
 6. **Persistência:** transação cria `analysis_runs` + scores + oportunidades (`pendente`) e muda `evaluations.status → analisado`, `diagnosis_status → pendente`.
@@ -122,10 +131,13 @@ Bucket privado `evaluation-files`, caminho `{analyst_user_id}/{evaluation_id}/{u
 
 ## 9. Indicadores
 
-Agregações do Dashboard, Meu desenvolvimento e Satisfação feitas por **views/RPCs SQL** (sem limites fixos de 500/1000 da REF — correção #4), com testes comparando com cálculo de referência em JS sobre o mesmo conjunto sintético.
+Fórmulas exatas: README-DEV Bloco F (CSAT positivo, média, taxa de resposta, distribuição, evolução 6 meses, gravidade, comparativo por analista como média das médias, relação competência×satisfação, contadores de curadoria). Agregações do Dashboard, Meu desenvolvimento e Satisfação feitas por **views/RPCs SQL** (sem limites fixos de 500/1000 da REF — correção #4), com testes comparando com cálculo de referência em JS sobre o mesmo conjunto sintético.
 
 ## 10. Ambientes e CI
 
 - Local: Vite dev server; Supabase local (CLI) para testes de RLS a partir da Fase 2 *[CLI ausente no ambiente atual]*.
 - CI: GitHub Actions — `npm ci`, `lint`, `test`, `build` (TASK-001); testes de banco com Supabase local/pgTAP a partir da Fase 2.
 - Publicação: fora do escopo até a Fase 6 e mediante autorização.
+
+## 11. Extensão de captura (D-018)
+Produto separado em `extension/` (Chromium MV3): captura por adaptador de plataforma, `.txt` por ticket na pasta escolhida pelo analista e envio por Edge Function de ingestão autenticada que cria/atualiza a avaliação pelo ticket e, em "Analisar ao vivo", dispara a análise. Especificação: `docs/specs/EXTENSAO_CAPTURA.md`.

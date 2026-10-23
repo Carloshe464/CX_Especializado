@@ -16,9 +16,12 @@
 
 Você é o operador de desenvolvimento do projeto **Protocolo CX 1.1** no repositório `Carloshe464/CX_Especializado`. Siga `AGENTS.md` integralmente. Sua tarefa é a **TASK-001 — Fundação React/Vite/Supabase**: criar a base local do frontend. **Não implemente telas reais, autenticação, banco de dados nem IA.**
 
+### 0. Pré-condição
+Crie a branch `task/001-fundacao` a partir da `main` atualizada. Se `docs/reference/README-DEV_AUDITORIA_TECNICA.md` **não existir** na `main`, pare e reporte: significa que os documentos de governança ainda não foram integrados.
+
 ### 1. Leitura obrigatória antes de começar
 - `AGENTS.md`, `docs/SECURITY.md`, `docs/DECISIONS.md` (D-003, D-004, D-005, D-006).
-- `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md` §2, §3 e §9 (stack, rotas e design system da aplicação original).
+- `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md` §2, §3 e §9 e `docs/reference/README-DEV_AUDITORIA_TECNICA.md` §A.2–A.4 e §E.1 (stack, rotas e design system reais da aplicação original).
 - `docs/ARCHITECTURE.md` §2.
 
 ### 2. Objetivo
@@ -27,8 +30,9 @@ Projeto React 18 + Vite em JavaScript ESM, com Tailwind CSS v3 e base do shadcn/
 ### 3. Escopo autorizado
 
 **3.1 Projeto e dependências** (npm; confira na documentação oficial a versão estável atual e a compatibilidade com React 18 e Node 22 antes de instalar; registre as versões no relatório)
-- Runtime: `react@18`, `react-dom@18`, `react-router-dom@7`, `@supabase/supabase-js@2`, `@tanstack/react-query@5`, `lucide-react`, `clsx`, `tailwind-merge`, `class-variance-authority`, `tailwindcss-animate`, `@radix-ui/react-slot`.
+- Runtime: `react@18`, `react-dom@18`, `react-router-dom@7`, `@supabase/supabase-js@2`, `@tanstack/react-query@5`, `lucide-react`, `clsx`, `tailwind-merge@2` (a linha 2.x é a compatível com Tailwind v3 — D-015), `class-variance-authority`, `tailwindcss-animate`, `@radix-ui/react-slot`.
 - Dev: `vite`, `@vitejs/plugin-react`, `tailwindcss@3` (última 3.4.x), `postcss`, `autoprefixer`, `eslint@9` (flat config), `@eslint/js`, `eslint-plugin-react`, `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`, `globals`, `vitest`, `jsdom`, `@testing-library/react`, `@testing-library/jest-dom`, `@testing-library/user-event`.
+- Versões de referência do original (README-DEV §A.3): `vite ^8`, `@vitejs/plugin-react ^6`, `react-router-dom ^7.18`, `lucide-react ^0.475`, `tailwindcss ^3.4.17`. Use a versão estável atual compatível; não instale `@base44/*` nem as ~25 dependências não usadas listadas em README-DEV §A.3.
 - **Não** instale Recharts, Playwright, Supabase CLI nem SDKs de IA nesta tarefa.
 - `package.json`: `"type": "module"`, `"private": true`, `"engines": { "node": ">=22" }`, scripts: `dev`, `build`, `preview`, `lint`, `test` (`vitest run`), `test:watch`.
 - `.nvmrc` com `22`. `package-lock.json` versionado.
@@ -41,7 +45,7 @@ jsconfig.json             # paths "@/*": ["./src/*"]
 tailwind.config.js
 postcss.config.js
 eslint.config.js
-components.json           # shadcn/ui, tsx: false, cssVariables: true, aliases com @/
+components.json           # shadcn/ui: style new-york, baseColor neutral, tsx: false, rsc: false, cssVariables: true, iconLibrary lucide
 .env.example
 .gitignore
 .nvmrc
@@ -53,15 +57,17 @@ src/
   lib/env.js
   lib/supabaseClient.js
   lib/utils.js            # cn() do shadcn
+  lib/query-client.js
   components/ui/button.jsx
   components/cx/AppShell.jsx
   pages/                  # páginas provisórias (ver 3.5)
   test/setup.js
   __tests__/              # ou testes colocalizados *.test.jsx
+public/favicon.svg, public/manifest.json
 supabase/migrations/.gitkeep
 ```
 
-**3.3 `index.html`** (REF §9.3): `lang="pt-BR"`, `<title>Protocolo de Inteligência CX</title>`, meta viewport, Google Fonts **Fraunces** (pesos 400–700, com eixo `opsz`) e **Inter** (400–700) com `preconnect`, `<div id="root">`, `<script type="module" src="/src/main.jsx">`. Favicon simples em `public/` (sem marca de terceiros).
+**3.3 `index.html`** (REF §9.3): `lang="pt-BR"`, `<title>Protocolo de Inteligência CX</title>`, meta viewport, Google Fonts **Fraunces** (pesos 400, 500, 600) e **Inter** (400, 500, 600) com `preconnect` (README-DEV §E.1), `<div id="root">`, `<script type="module" src="/src/main.jsx">`. Favicon simples em `public/` (sem marca Base44) e `public/manifest.json` mínimo (`name` "Protocolo de Inteligência CX", `lang` "pt-BR"), referenciado no `index.html` como no original.
 
 **3.4 Design tokens**
 - `src/index.css`: diretivas `@tailwind base/components/utilities` e o bloco `:root` com **exatamente** estes valores (REF §9.1):
@@ -77,12 +83,13 @@ supabase/migrations/.gitkeep
   --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Fraunces', Georgia, serif;
   ```
-- Tokens exigidos pelo Tailwind/shadcn mas **ausentes na REF** devem ser definidos com estes valores derivados e marcados com o comentário `/* derivado — confirmar com README-DEV */`: `--card-foreground: 20 15% 12%`, `--popover: 0 0% 100%`, `--popover-foreground: 20 15% 12%`, `--input: 40 18% 88%`, `--destructive-foreground: 40 30% 98%`, `--chart-1: 174 42% 21%`, `--chart-2: 174 30% 40%`, `--chart-3: 38 70% 50%`, `--chart-4: 8 70% 48%`, `--chart-5: 200 60% 45%`, `--sidebar-background: 40 30% 98%`, `--sidebar-foreground: 20 15% 12%`, `--sidebar-primary: 174 42% 21%`, `--sidebar-primary-foreground: 40 30% 98%`, `--sidebar-accent: 38 45% 92%`, `--sidebar-accent-foreground: 30 25% 20%`, `--sidebar-border: 40 18% 88%`, `--sidebar-ring: 174 42% 21%`.
+- `--input: 40 18% 88%` (confirmado pelo README-DEV §E.1).
+- Tokens que existem no original mas cujos valores **não foram documentados** devem usar estes valores derivados, marcados com o comentário `/* derivado — valor original não documentado */`: `--card-foreground: 20 15% 12%`, `--popover: 0 0% 100%`, `--popover-foreground: 20 15% 12%`, `--destructive-foreground: 40 30% 98%`, `--chart-1: 174 42% 21%`, `--chart-2: 174 30% 40%`, `--chart-3: 38 70% 50%`, `--chart-4: 8 70% 48%`, `--chart-5: 200 60% 45%`, `--sidebar-background: 40 30% 98%`, `--sidebar-foreground: 20 15% 12%`, `--sidebar-primary: 174 42% 21%`, `--sidebar-primary-foreground: 40 30% 98%`, `--sidebar-accent: 38 45% 92%`, `--sidebar-accent-foreground: 30 25% 20%`, `--sidebar-border: 40 18% 88%`, `--sidebar-ring: 174 42% 21%`.
 - Não crie tema escuro nem toggle (a REF usa apenas o tema claro).
 - `@layer base`: `body` com `bg-background text-foreground font-body antialiased`; `h1–h4` com `font-heading tracking-tight`; `* { @apply border-border; }`.
 - `tailwind.config.js` (REF §9.2): `content` em `index.html` e `src/**/*.{js,jsx}`; `colors` mapeando todos os tokens via `hsl(var(--x))` (background, foreground, card, popover, primary, secondary, muted, accent, destructive, border, input, ring, chart.1–5, sidebar.*); `borderRadius` `lg: var(--radius)`, `md: calc(var(--radius) - 2px)`, `sm: calc(var(--radius) - 4px)`; `fontFamily` `heading`, `body`, `display` via variáveis e `mono` padrão; `opacity` de 0 a 100 em passos de 1 (`'0'…'100'` → `0…1`); keyframes/animation `accordion-down`/`accordion-up`; plugin `tailwindcss-animate`.
 
-**3.5 Roteamento** (REF §3) — `src/App.jsx` com `QueryClientProvider` → `BrowserRouter` → `Routes`:
+**3.5 Roteamento** (REF §3) — `src/App.jsx` com `QueryClientProvider` (cliente em `src/lib/query-client.js` com `refetchOnWindowFocus: false, retry: 1`, igual ao original) → `BrowserRouter` → `Routes`:
 | Rota | Página provisória | Layout |
 |---|---|---|
 | `/login`, `/register`, `/forgot-password`, `/reset-password` | Login, Register, ForgotPassword, ResetPassword | sem layout |
@@ -171,5 +178,5 @@ Abra o PR `TASK-001: Fundação React/Vite/Supabase` para `main` com o relatóri
 ## Notas do orquestrador para a revisão
 - Conferir que nenhuma página provisória antecipa comportamento (sem dados fictícios simulando a app).
 - Conferir que a regra anti-`require` está ativa e que `npm ci` funciona a partir do lockfile limpo.
-- Conferir os tokens derivados marcados para confirmação (dependem do README-DEV).
+- Conferir os tokens derivados marcados (valores originais não documentados; reconciliar na comparação visual P-39).
 - Conferir que o CI roda em `pull_request` e está verde no último commit do PR.

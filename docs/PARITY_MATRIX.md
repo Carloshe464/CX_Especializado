@@ -2,10 +2,12 @@
 
 Meta: **99% de paridade verificável**. Um item só conta como atingido com status **✅ Verificado** e um teste/evidência rastreável na coluna "Verificação". Itens marcados **Corrigido** reproduzem o objetivo funcional da REF com o comportamento ajustado por uma decisão (D-xxx).
 
+Itens **Alterado** seguem a nova regra decidida pelo responsável (não a REF) e contam como paridade quando a regra nova estiver verificada.
+
 Status: ⬜ Não iniciado · 🟨 Em andamento · 🟦 Implementado (sem evidência) · ✅ Verificado · ⛔ Bloqueado
 REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 
-**Paridade atual comprovada: 0 / 96 itens (0%).**
+**Paridade atual comprovada: 0 / 102 itens (0%).**
 
 ## Fundação e visual
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
@@ -37,8 +39,8 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 |---|---|---|---|---|---|---|
 | S-01 | 9 entidades + perfis em PostgreSQL | §4 | Funcional | D-002, D-010 | migração + testes | ⬜ |
 | S-02 | Analista vê só os próprios dados | §4 | Segurança | Paridade | matriz RLS | ⬜ |
-| S-03 | Analista não vê diagnóstico pendente por nenhuma rota | §1, §7.4 | Segurança | Corrigido D-007#1, D-011 | matriz RLS | ⬜ |
-| S-04 | Curadoria só por supervisor (API e banco) | §4 | Segurança | Corrigido D-007#2 | matriz RLS | ⬜ |
+| S-03 | Analista vê a análise só das próprias avaliações; nunca de outro analista ou outra organização | §1, §7.4 | Segurança | **Alterado D-011** | matriz RLS | ⬜ |
+| S-04 | Veredito de supervisor só por supervisor da organização (API e banco); prevalece sobre o do analista | §4 | Segurança | Corrigido D-007#2 + D-011 | matriz RLS | ⬜ |
 | S-05 | `curation_logs` imutável | §4.6 | Segurança | Corrigido | teste | ⬜ |
 | S-06 | Papel não controlável pelo usuário | — | Segurança | SEC-04 | teste | ⬜ |
 | S-07 | Storage privado com URLs assinadas 3600 s | §10 | Segurança | Paridade | teste | ⬜ |
@@ -77,7 +79,7 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
 |---|---|---|---|---|---|---|
 | P-01 | Dashboard: badge curadoria pendente | §7.1 | Funcional | Paridade | teste | ⬜ |
-| P-02 | Dashboard: 4 StatCards (CSAT+, média, total, taxa de resposta) | §7.1 | Funcional | Paridade; definição de "taxa de resposta" a confirmar | teste com dataset | ⬜ |
+| P-02 | Dashboard: 4 StatCards (CSAT+, média, total, taxa de resposta) | §7.1 | Funcional | Paridade; fórmulas README-DEV Bloco F (taxa de resposta = avaliações com ≥1 CSAT / avaliações) | teste com dataset | ⬜ |
 | P-03 | Dashboard: CsatDistribution + SeverityChart + contadores de curadoria | §7.1 | Funcional | Paridade | teste | ⬜ |
 | P-04 | Dashboard: CompetencyEvolution (6 meses, `AAAA-MM`) | §7.1 | Funcional | Paridade | teste | ⬜ |
 | P-05 | Dashboard: AnalystComparison | §7.1 | Funcional | Paridade | teste | ⬜ |
@@ -91,13 +93,13 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | P-13 | Nova avaliação: regras de `source` e `status` | §7.3 | Funcional | Paridade | teste | ⬜ |
 | P-14 | Detalhe: cabeçalho (kicker, título, linha meta, status, Reanalisar) | §7.4 | Visual/Func. | Paridade | screenshot + teste | ⬜ |
 | P-15 | Detalhe: 3 métricas | §7.4 | Funcional | Paridade | teste | ⬜ |
-| P-16 | Detalhe: Competências / placeholder de bloqueio | §7.4 | Funcional | D-011 | teste | ⬜ |
+| P-16 | Detalhe: Competências visíveis ao analista dono + controles de validação | §7.4 | Funcional | **Alterado D-011** | teste | ⬜ |
 | P-17 | Detalhe: DiagnosisCard, CurationCard, CsatPanel | §7.4 | Funcional | Paridade | teste | ⬜ |
 | P-18 | Detalhe: oportunidades com decisões do supervisor | §7.4 | Funcional | Paridade | teste | ⬜ |
 | P-19 | Detalhe não analisado: PrintGallery, editar/salvar transcrição, Analisar | §7.4 | Funcional | Paridade | teste | ⬜ |
 | P-20 | Curadoria: fila pendente + curadoria recente (10) | §7.5 | Funcional | Paridade | teste | ⬜ |
 | P-21 | Curadoria grava log por decisão | §7.4 | Funcional | Paridade | teste | ⬜ |
-| P-22 | Meu desenvolvimento: só aprovados, 3 StatCards | §7.6 | Funcional | Paridade | teste | ⬜ |
+| P-22 | Meu desenvolvimento: só itens com veredito efetivo positivo, 3 StatCards | §7.6 | Funcional | **Alterado D-011** | teste | ⬜ |
 | P-23 | Meu desenvolvimento: barras por competência, cartões por avaliação | §7.6 | Funcional | Paridade | teste | ⬜ |
 | P-24 | Satisfação: StatCards | §7.7 | Funcional | Paridade | teste | ⬜ |
 | P-25 | Satisfação: importar planilha / PDF-print com prévia | §7.7 | Funcional | Paridade | e2e | ⬜ |
@@ -126,3 +128,27 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | P-48 | Pipeline CI (lint, test, build) | — | Técnico | — | CI verde | ⬜ |
 | P-49 | Documentação de execução local | — | Técnico | — | README | ⬜ |
 | P-50 | Auditoria de custos (planos gratuitos) | — | Infra | — | relatório Fase 6 | ⬜ |
+| P-51 | Defaults de oportunidade (Desejável / Indeterminada / Médio / pendente) | README-DEV C.3 | Funcional | Paridade | teste | ⬜ |
+| P-52 | Classificação calculada pelo sistema, não confiada ao LLM | README-DEV C.3 | Funcional | Paridade | teste | ⬜ |
+| P-53 | CSAT: todos os registros nas médias; badge da lista usa o mais recente | README-DEV B.4, F | Funcional | Paridade | teste | ⬜ |
+| P-54 | Mensagens literais (bloqueio em curadoria, zero oportunidades, pesquisa inválida, obrigado) | README-DEV E.3 | Visual | Paridade | snapshot de texto | ⬜ |
+| P-55 | Charts: cores, alturas e formas (Bar h-64, Line h-72 domain 0–10, donut 55/85) | README-DEV E.3 | Visual | Paridade | snapshot | ⬜ |
+| P-56 | Reimportação não duplica CSAT | README-DEV D.10 | Integridade | Corrigido D-007 | teste | ⬜ |
+
+## Funcionalidades novas (fora da paridade — não entram no percentual)
+| ID | Funcionalidade | Decisão | Especificação | Status |
+|---|---|---|---|---|
+| N-01 | Organizações, vínculos e admin da plataforma | D-002, D-017 | ARCHITECTURE §3 | ⬜ |
+| N-02 | Login Google + cadastro aberto | D-008 | ARCHITECTURE §3 | ⬜ |
+| N-03 | Validação do analista (gostei/útil/comentário) em diagnóstico e oportunidades | D-011 | specs/VALIDACAO_E_CURADORIA | ⬜ |
+| N-04 | Veredito do supervisor com prioridade | D-011 | specs/VALIDACAO_E_CURADORIA | ⬜ |
+| N-05 | Taxa de utilidade da IA (individual p/ analista; organização p/ supervisor) | D-011 | specs/VALIDACAO_E_CURADORIA | ⬜ |
+| N-06 | Configuração de provedor/modelo/chave de IA pela interface | D-009 | specs/PROVEDOR_IA | ⬜ |
+| N-07 | Supervisor escolhe analista ao criar avaliação | D-013 | ARCHITECTURE §4 | ⬜ |
+| N-08 | Extensão de captura com salvamento automático em `.txt` | D-018 | specs/EXTENSAO_CAPTURA | ⬜ |
+| N-09 | "Analisar ao vivo" na extensão | D-018 | specs/EXTENSAO_CAPTURA | ⬜ |
+| N-10 | Ingestão por número do ticket (URL) | D-018, D-012 | specs/EXTENSAO_CAPTURA | ⬜ |
+| N-11 | Modelos locais de IA | D-009 (futuro distante) | specs/PROVEDOR_IA §4 | 💤 |
+| N-12 | Oportunidades com comunicação assertiva e rapport (Protocolo V1.2) + campo `communication_techniques` | D-019 | specs/PROTOCOLO_PROMPT_V1.2 | ⬜ |
+| N-13 | Importação de `.txt` da extensão (ticket como protocolo) | D-018 | specs/EXTENSAO_CAPTURA | ⬜ |
+| N-14 | Entrada na organização por domínio de e-mail | D-017 | DECISIONS D-017 | ⬜ |
