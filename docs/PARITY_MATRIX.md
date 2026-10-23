@@ -7,7 +7,7 @@ Itens **Alterado** seguem a nova regra decidida pelo responsável (não a REF) e
 Status: ⬜ Não iniciado · 🟨 Em andamento · 🟦 Implementado (sem evidência) · ✅ Verificado · ⛔ Bloqueado
 REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 
-**Paridade atual comprovada: 7 / 102 itens (6,9%)** — TASK-001 mesclada (PR #2).
+**Paridade atual comprovada: 15 / 102 itens (14,7%)** — TASK-001 (PR #2) e TASK-002 (PR #4) mescladas.
 
 ## Fundação e visual
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
@@ -19,7 +19,7 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | V-05 | Topbar mobile sticky com pills; ativo `bg-primary` | §8 Layout | Visual | Paridade | screenshot mobile | ⬜ |
 | V-06 | Itens de menu por papel (Painel, Avaliações, Nova avaliação, Curadoria, Satisfação, Protocolo, Meu desenvolvimento) | §8 Layout | Funcional | Paridade | teste por papel | ⬜ |
 | V-07 | Cards `rounded-2xl border bg-card`, títulos `font-heading`, placeholders dashed, `Loader2` | §8 | Visual | Paridade | screenshot | ⬜ |
-| V-08 | Estilos de badges (classificação, gravidade, tendência, status) | §5 | Visual | Paridade | snapshot | ⬜ |
+| V-08 | Estilos de badges (classificação, gravidade, tendência, status) | §5 | Visual | Paridade | classes literais testadas em `cx.test.js` (PR #4); falta render/snapshot | 🟨 |
 | V-09 | UI integralmente em pt-BR; datas `pt-BR` | §2 | Visual | Paridade | revisão + teste formatDate | ⬜ |
 | V-10 | Sem erros de console; build ESM sem `require` | §12 | Técnico | Paridade | lint anti-`require` ✅ (PR #2); console sem erros ⬜ (e2e) | 🟨 |
 
@@ -52,13 +52,13 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 ## Domínio (`lib/cx.js`)
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
 |---|---|---|---|---|---|---|
-| D-01 | Constantes exatas (competências, severidades, origens, confianças, tendências, status, níveis CSAT) | §5 | Funcional | Paridade | teste unitário | ⬜ |
-| D-02 | `scoreClassification` incl. decimais e null/NaN | §5 | Funcional | Paridade | teste com fronteiras (8.99, 9, 6.5…) | ⬜ |
-| D-03 | `csatBand` com limiar configurável | §5 | Funcional | Paridade | teste | ⬜ |
-| D-04 | `deriveScoreFromLevel`, `parseNota`, `scoreFromSentiment` | §5, §6 | Funcional | Paridade | teste | ⬜ |
-| D-05 | `normalizeTrend` | §7.4 | Funcional | Paridade | teste | ⬜ |
-| D-06 | `formatDate` pt-BR, `—`, string crua inválida | §5 | Funcional | Paridade | teste | ⬜ |
-| D-07 | `STATUS_LABELS` ("Em curadoria" para analisado) | §5 | Funcional | Paridade | teste | ⬜ |
+| D-01 | Constantes exatas (competências, severidades, origens, confianças, tendências, status, níveis CSAT) | §5 | Funcional | Paridade | `src/__tests__/cx.test.js` (PR #4) | ✅ |
+| D-02 | `scoreClassification` incl. decimais e null/NaN | §5 | Funcional | Paridade | `src/__tests__/cx.test.js` (PR #4) | ✅ |
+| D-03 | `csatBand` com limiar configurável | §5 | Funcional | Paridade | `src/__tests__/cx.test.js` (PR #4) | ✅ |
+| D-04 | `deriveScoreFromLevel`, `parseNota`, `scoreFromSentiment` | §5, §6 | Funcional | Paridade | `src/__tests__/cx.test.js` (PR #4) | ✅ |
+| D-05 | `normalizeTrend` | §7.4 | Funcional | Paridade | `src/__tests__/cx.test.js` (PR #4) | ✅ |
+| D-06 | `formatDate` pt-BR, `—`, string crua inválida | §5 | Funcional | Paridade | `src/__tests__/cx.test.js` (PR #4) | ✅ |
+| D-07 | `STATUS_LABELS` ("Em curadoria" para analisado) | §5 | Funcional | Paridade | `src/__tests__/cx.test.js` (PR #4) | ✅ |
 
 ## Motor de IA
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
@@ -128,8 +128,8 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | P-48 | Pipeline CI (lint, test, build) | — | Técnico | — | CI run 39986235495 (workflow manual desde D-021) | ✅ |
 | P-49 | Documentação de execução local | — | Técnico | — | README (PR #2) | ✅ |
 | P-50 | Auditoria de custos (planos gratuitos) | — | Infra | — | relatório Fase 6 | ⬜ |
-| P-51 | Defaults de oportunidade (Desejável / Indeterminada / Médio / pendente) | README-DEV C.3 | Funcional | Paridade | teste | ⬜ |
-| P-52 | Classificação calculada pelo sistema, não confiada ao LLM | README-DEV C.3 | Funcional | Paridade | teste | ⬜ |
+| P-51 | Defaults de oportunidade (Desejável / Indeterminada / Médio / pendente) | README-DEV C.3 | Funcional | Paridade | `src/__tests__/cx.test.js` (PR #4) | ✅ |
+| P-52 | Classificação calculada pelo sistema, não confiada ao LLM | README-DEV C.3 | Funcional | Paridade | `scoreClassification` testada (PR #4); falta uso no motor (Fase 3) | 🟨 |
 | P-53 | CSAT: todos os registros nas médias; badge da lista usa o mais recente | README-DEV B.4, F | Funcional | Paridade | teste | ⬜ |
 | P-54 | Mensagens literais (bloqueio em curadoria, zero oportunidades, pesquisa inválida, obrigado) | README-DEV E.3 | Visual | Paridade | snapshot de texto | ⬜ |
 | P-55 | Charts: cores, alturas e formas (Bar h-64, Line h-72 domain 0–10, donut 55/85) | README-DEV E.3 | Visual | Paridade | snapshot | ⬜ |
@@ -149,6 +149,6 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | N-09 | "Analisar ao vivo" na extensão | D-018 | specs/EXTENSAO_CAPTURA | ⬜ |
 | N-10 | Ingestão por número do ticket (URL) | D-018, D-012 | specs/EXTENSAO_CAPTURA | ⬜ |
 | N-11 | Modelos locais de IA | D-009 (futuro distante) | specs/PROVEDOR_IA §4 | 💤 |
-| N-12 | Oportunidades com comunicação assertiva e rapport (Protocolo V1.2) + campo `communication_techniques` | D-019 | specs/PROTOCOLO_PROMPT_V1.2 | ⬜ |
+| N-12 | Oportunidades com comunicação assertiva e rapport (Protocolo V1.2) + campo `communication_techniques` | D-019 | specs/PROTOCOLO_PROMPT_V1.2 | 🟨 lista e filtro em `cx.js` (PR #4) |
 | N-13 | Importação de `.txt` da extensão (ticket como protocolo) | D-018 | specs/EXTENSAO_CAPTURA | ⬜ |
 | N-14 | Entrada na organização por domínio de e-mail | D-017 | DECISIONS D-017 | ⬜ |
