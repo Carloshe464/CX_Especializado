@@ -271,8 +271,12 @@ grant execute on function private.is_platform_admin() to authenticated;
 -- RPCs de entrada na organização (SEC-03, SEC-22, D-023)
 -- ---------------------------------------------------------------------------
 
--- Cria a organização do chamador e o torna supervisor. O domínio, se informado,
--- precisa ser exatamente o do e-mail verificado, não público e ainda livre.
+-- Cria uma organização (D-023). Dois caminhos:
+-- (1) Admin da plataforma (caminho principal no lançamento): cria a organização sem
+--     vínculo para si, com qualquer domínio não público e livre. O primeiro supervisor
+--     entra pelo domínio, como analista, e o admin o promove com set_member_role.
+-- (2) Autoatendimento: exige e-mail verificado e ausência de vínculo; o chamador vira
+--     supervisor. O domínio, se informado, precisa ser exatamente o do e-mail verificado.
 create function public.create_organization(p_name text, p_domain text default null)
 returns uuid
 language plpgsql
@@ -286,19 +290,24 @@ declare
   v_name text := btrim(coalesce(p_name, ''));
   v_domain text := nullif(lower(btrim(coalesce(p_domain, ''))), '');
   v_org_id uuid;
+  v_is_admin boolean;
 begin
   if v_uid is null then
     raise exception 'Autenticação necessária.' using errcode = 'CX001';
   end if;
 
-  select u.email, u.email_confirmed_at into v_email, v_confirmed_at
-  from auth.users u where u.id = v_uid;
-  if v_email is null or v_confirmed_at is null then
-    raise exception 'Confirme o seu e-mail antes de criar uma empresa.' using errcode = 'CX002';
-  end if;
+  v_is_admin := private.is_platform_admin();
 
-  if exists (select 1 from public.memberships m where m.user_id = v_uid) then
-    raise exception 'Você já está vinculado a uma empresa.' using errcode = 'CX003';
+  if not v_is_admin then
+    select u.email, u.email_confirmed_at into v_email, v_confirmed_at
+    from auth.users u where u.id = v_uid;
+    if v_email is null or v_confirmed_at is null then
+      raise exception 'Confirme o seu e-mail antes de criar uma empresa.' using errcode = 'CX002';
+    end if;
+
+    if exists (select 1 from public.memberships m where m.user_id = v_uid) then
+      raise exception 'Você já está vinculado a uma empresa.' using errcode = 'CX003';
+    end if;
   end if;
 
   if length(v_name) not between 2 and 120 then
@@ -309,7 +318,8 @@ begin
     if v_domain !~ '^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$' then
       raise exception 'Domínio em formato inválido.' using errcode = 'CX008';
     end if;
-    if v_domain <> lower(substring(v_email from '@([^@]+)$')) then
+    -- No autoatendimento o domínio precisa ser o do e-mail verificado; o admin é global.
+    if not v_is_admin and v_domain <> lower(substring(v_email from '@([^@]+)$')) then
       raise exception 'O domínio da empresa deve ser o mesmo do seu e-mail verificado.' using errcode = 'CX005';
     end if;
     if exists (select 1 from private.public_email_domains d where d.domain = v_domain) then
@@ -322,7 +332,10 @@ begin
   end if;
 
   insert into public.organizations (name, created_by) values (v_name, v_uid) returning id into v_org_id;
-  insert into public.memberships (user_id, organization_id, role) values (v_uid, v_org_id, 'supervisor');
+  -- O admin da plataforma não recebe vínculo: o acesso dele é global.
+  if not v_is_admin then
+    insert into public.memberships (user_id, organization_id, role) values (v_uid, v_org_id, 'supervisor');
+  end if;
   if v_domain is not null then
     insert into public.organization_domains (organization_id, domain) values (v_org_id, v_domain);
   end if;
@@ -331,7 +344,7 @@ begin
 exception
   -- Corrida entre duas chamadas simultâneas: traduz a violação de unicidade.
   when unique_violation then
-    if exists (select 1 from public.memberships m where m.user_id = v_uid) then
+    if not v_is_admin and exists (select 1 from public.memberships m where m.user_id = v_uid) then
       raise exception 'Você já está vinculado a uma empresa.' using errcode = 'CX003';
     end if;
     raise exception 'Este domínio já pertence a outra empresa.' using errcode = 'CX007';

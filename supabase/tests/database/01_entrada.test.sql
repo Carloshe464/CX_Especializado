@@ -2,7 +2,7 @@
 -- join_organization_by_domain e set_member_role (SEC-03, SEC-22, D-023).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(33);
+select plan(41);
 
 -- Troca a identidade da sessão para um usuário autenticado (chamar como postgres).
 create function pg_temp.login(uid uuid) returns void language plpgsql as $$
@@ -42,7 +42,7 @@ select is(
 );
 update auth.users set email = 'pessoa@semempresa.test' where id = '00000000-0000-4000-8000-000000000006';
 
--- 5. create_organization ----------------------------------------------------
+-- 5. create_organization: autoatendimento -----------------------------------
 select pg_temp.login('00000000-0000-4000-8000-000000000007');
 select throws_ok($$ select public.create_organization('Empresa X', 'exemplo.test') $$,
   'CX002', null, 'recusa e-mail não verificado');
@@ -86,10 +86,39 @@ select throws_ok($$ select public.create_organization('Empresa Concorrente', 'ex
   'CX007', null, 'recusa domínio já usado por outra organização');
 reset role;
 
-select pg_temp.login('00000000-0000-4000-8000-000000000005');
+-- 5. create_organization: caminho do admin da plataforma (D-023) -------------
+select pg_temp.login('00000000-0000-4000-8000-000000000001');
+select throws_ok($$ select public.create_organization('Empresa Pública', 'gmail.com') $$,
+  'CX006', null, 'admin: recusa domínio público');
+select throws_ok($$ select public.create_organization('Empresa Duplicada', 'exemplo.test') $$,
+  'CX007', null, 'admin: recusa domínio já em uso');
 select isnt(public.create_organization('Empresa Y', 'outraempresa.test'), null,
-  'supervisor Y cria a própria organização');
+  'admin cria organização com domínio de outra empresa (outraempresa.test)');
 reset role;
+
+select ok(not exists (select 1 from public.memberships where user_id = '00000000-0000-4000-8000-000000000001'),
+  'admin não ganha vínculo ao criar a organização');
+select results_eq(
+  $$ select o.name, o.created_by from public.organizations o
+     join public.organization_domains d on d.organization_id = o.id where d.domain = 'outraempresa.test' $$,
+  $$ values ('Empresa Y'::text, '00000000-0000-4000-8000-000000000001'::uuid) $$,
+  'organização do admin gravada com o domínio informado'
+);
+
+-- Fluxo do lançamento: usuário do domínio entra como analista e o admin o promove.
+select pg_temp.login('00000000-0000-4000-8000-000000000005');
+select lives_ok($$ select public.join_organization_by_domain() $$,
+  'usuário de outraempresa.test entra na organização criada pelo admin');
+reset role;
+select is((select role from public.memberships where user_id = '00000000-0000-4000-8000-000000000005'),
+  'analista', 'o primeiro usuário entra como analista');
+
+select pg_temp.login('00000000-0000-4000-8000-000000000001');
+select lives_ok($$ select public.set_member_role('00000000-0000-4000-8000-000000000005', 'supervisor') $$,
+  'admin promove o primeiro supervisor');
+reset role;
+select is((select role from public.memberships where user_id = '00000000-0000-4000-8000-000000000005'),
+  'supervisor', 'supervisor Y promovido pelo admin');
 
 select throws_ok(
   $$ insert into public.organization_domains (organization_id, domain)
