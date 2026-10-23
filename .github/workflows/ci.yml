@@ -1,8 +1,9 @@
 name: CI
 
+# Execução automática desativada por D-021 (economia de minutos do GitHub Actions).
+# Somente disparo manual, com autorização do responsável. Validação padrão: comandos locais.
 on:
-  push:
-  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
