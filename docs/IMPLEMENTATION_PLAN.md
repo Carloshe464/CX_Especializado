@@ -5,7 +5,7 @@ Cada fase só começa quando os critérios de saída da fase anterior estiverem 
 ## Fase 0 — Reconhecimento e planejamento ✅ (orquestrador)
 Entregas: governança (`CLAUDE.md`, `AGENTS.md`), arquitetura, decisões, segurança, matriz de paridade, TASK-001.
 Saída: documentos versionados; TASK-001 pronta para encaminhamento.
-Pendências que **não bloqueiam a Fase 1**: Supabase MCP indisponível nesta sessão; perguntas abertas em `docs/specs/*` e D-017.
+Pendências que **não bloqueiam a Fase 1**: Supabase MCP indisponível nesta sessão; pendências menores listadas em `docs/TASKS.md`.
 
 ## Fase 1 — Fundação técnica
 | Tarefa | Escopo | Depende de |
@@ -17,7 +17,7 @@ Pendências que **não bloqueiam a Fase 1**: Supabase MCP indisponível nesta se
 Saída: build e CI verdes; V-01…V-03, V-09, V-10, R-01, R-07, D-01…D-07, P-48, P-49 verificados.
 
 ## Fase 2 — Banco e autenticação
-**Pré-requisitos:** fluxo de entrada na organização (D-017) e respostas da spec de validação; Supabase CLI disponível para o operador (testes locais).
+**Pré-requisitos:** Fase 1 verificada; Supabase CLI disponível para o operador (testes locais). Decisões de produto já tomadas (D-002, D-008, D-011, D-012, D-013, D-017).
 | Tarefa | Escopo |
 |---|---|
 | TASK-010 | Migrações: `organizations`, `memberships`, `platform_admins`, `profiles`, funções de papel/organização, enums/constraints |
@@ -27,10 +27,10 @@ Saída: build e CI verdes; V-01…V-03, V-09, V-10, R-01, R-07, D-01…D-07, P-4
 | TASK-014 | Auth no frontend: Google + e-mail, AuthProvider, ProtectedRoute, RequireRole, onboarding de organização, telas de auth |
 | TASK-015 | **Revisão de segurança** pelo orquestrador + pedido de autorização para aplicar no remoto |
 
-Saída: matriz RLS 100% verde localmente (S-01…S-08, S-10); autorização registrada antes de qualquer `db push`.
+Saída: matriz RLS 100% verde localmente (S-01…S-08, S-10, SEC-18, SEC-22); autorização registrada antes de qualquer `db push`.
 
 ## Fase 3 — Motor CX 1.1
-**Pré-requisito:** escolha do primeiro provedor a suportar (D-009) e se a chave é por organização.
+**Pré-requisito:** escolha do primeiro adaptador de provedor (D-009). Chave por organização (decidido).
 TASK-020 adaptadores de provedor + schemas de validação · TASK-025 tela e Edge Function de configuração do provedor (Vault, testar conexão) · TASK-021 prompts versionados V1.1 e V1.2 (hash verbatim; D-019) · TASK-022 Edge Function `analyze-evaluation` com persistência transacional e tratamento de falhas · TASK-023 `extract-transcript` (visão) · TASK-024 suíte de transcrições sintéticas.
 Saída: A-01…A-09 verificados com mocks e com ao menos uma execução real autorizada.
 
