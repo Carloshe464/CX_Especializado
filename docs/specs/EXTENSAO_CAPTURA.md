@@ -12,7 +12,7 @@ Capturar a transcrição dos atendimentos no navegador do analista, salvá-la em
 | E2 | Caixa de status mostrando "Aguardando o atendimento ser finalizado para salvar" |
 | E3 | **Salvamento automático** do `.txt` ao fim do atendimento, sem clique |
 | E4 | Botão explícito **Analisar ao vivo**: captura até a última mensagem enviada, grava no mesmo `.txt` e envia para análise |
-| E5 | Número do atendimento/ticket lido da URL identifica o arquivo e o registro no sistema |
+| E5 | Número do ticket (número de exibição do cabeçalho, §7.3) identifica o arquivo `NNNNNNN.txt` e o registro no sistema |
 | E6 | Funcionamento semelhante à extensão Neeko (referência do responsável) |
 
 ## 3. Desenho técnico proposto
@@ -35,7 +35,7 @@ Sem pasta → Aguardando atendimento → Capturando (ticket N, X mensagens) → 
 Fase 2 (auth + organizações), Fase 3 (motor de IA) e a Edge Function de ingestão. Trilha própria após a Fase 4.
 
 ## 6. Perguntas abertas
-1. ✅ ClickDesk, com scraping leve. ✅ Estrutura do DOM recebida em 2026-10-23 (mapa anonimizado na §7). ❓ Falta o **padrão da URL** da página do ticket e qual número é o protocolo (ver §7.3).
+1. ✅ ClickDesk, com scraping leve. ✅ DOM mapeado (§7). ✅ Protocolo = número de exibição do cabeçalho; arquivo `NNNNNNN.txt`.
 2. ⏸️ Detecção de fim de atendimento: stand-by.
 3. ✅ Só grava o `.txt`, para importar depois.
 4. ✅ A princípio, resultado só no site.
@@ -68,9 +68,9 @@ Fase 2 (auth + organizações), Fase 3 (motor de IA) e a Edge Function de ingest
 | Eventos do sistema | `div.flex.justify-center > span.rounded-full` (ex.: triagem, transferência da IA para humano) |
 | Ações da UI | `.msg-action` (responder, ocultar, curtir) → ignorar |
 
-### 7.3 Pontos em aberto
-- O número exibido no cabeçalho (`#NNNNNNN`) **difere** do id interno que aparece nos caminhos dos anexos (`/tickets/<id>/`). Confirmar qual é o protocolo e qual aparece na URL da página.
-- **Formato do `.txt`** (proposta, derivada):
+### 7.3 Decisões (2026-10-23)
+- **Número do ticket:** é o número de **exibição** do cabeçalho (`#NNNNNNN`, sem o `#`), não o id interno dos caminhos de anexo. Ele vira o `protocol` (D-012) e o nome do arquivo: `NNNNNNN.txt`. Como a leitura é pelo cabeçalho do DOM, não depende do formato da URL.
+- **Formato do `.txt`** (aceito):
   - `Atendente:` para o analista humano;
   - `Cliente:` para o cliente;
   - `Bot:` para mensagens do "Sistema";

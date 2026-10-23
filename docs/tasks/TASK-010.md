@@ -72,7 +72,7 @@ Para todas:
 
 | RPC | Regra |
 |---|---|
-| `create_organization(p_name text, p_domain text default null) returns uuid` | Exige e-mail verificado (`auth.users.email_confirmed_at is not null`) e que o chamador **não** tenha vínculo. Cria a organização e o vínculo `supervisor`. Se `p_domain` vier, normaliza (`lower(btrim)`) e só aceita se: (a) for **exatamente** o domínio do e-mail verificado do chamador; (b) não for domínio público; (c) não pertencer a outra organização (D-023). |
+| `create_organization(p_name text, p_domain text default null) returns uuid` | **Dois caminhos** (D-023):<br>**(1) Admin da plataforma**, o caminho principal no lançamento: cria a organização **sem** criar vínculo para si, já que o admin é global. Aceita qualquer `p_domain` que não seja público nem esteja em uso. O primeiro supervisor entra pelo domínio, como analista, e o admin o promove com `set_member_role`.<br>**(2) Autoatendimento:** exige e-mail verificado (`auth.users.email_confirmed_at is not null`) e que o chamador **não** tenha vínculo. Cria a organização e o vínculo `supervisor`. Se `p_domain` vier, normaliza (`lower(btrim)`) e só aceita se: (a) for **exatamente** o domínio do e-mail verificado do chamador; (b) não for domínio público; (c) não pertencer a outra organização. |
 | `join_organization_by_domain() returns uuid` | Exige e-mail verificado e ausência de vínculo. Procura o domínio do e-mail em `organization_domains` e cria o vínculo **sempre** como `analista` (SEC-22). Sem correspondência → erro "Nenhuma empresa cadastrada para o domínio do seu e-mail". |
 | `set_member_role(p_user_id uuid, p_role text) returns void` | Permitida a supervisor da **mesma** organização do alvo, ou a admin da plataforma. Proibido alterar o próprio papel. Proibido deixar a organização sem supervisor. |
 
@@ -98,7 +98,9 @@ Nenhuma política para `anon` (SEC-10).
 3. **SEC-10:** `anon` não tem privilégio de SELECT/INSERT/UPDATE/DELETE em nenhuma tabela de `public` (`has_table_privilege`).
 4. **Trigger de perfil:** inserir em `auth.users` cria `profiles`; mudar o e-mail sincroniza.
 5. **`create_organization`:**
-   - Caminho feliz: cria a organização e vira supervisor.
+   - Caminho feliz, autoatendimento: cria a organização e vira supervisor.
+   - Caminho do admin: cria com domínio de outra empresa (`outraempresa.test`) sem gerar vínculo para o admin; recusa domínio público.
+   - Fluxo completo do lançamento: o admin cria → um usuário do domínio entra como analista → o admin o promove a supervisor.
    - Recusas:
      - e-mail não verificado;
      - usuário já vinculado;

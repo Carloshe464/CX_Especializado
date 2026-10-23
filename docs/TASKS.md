@@ -30,7 +30,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 1. ~~Criar `main` e defini-la como padrão~~ — feito.
 2. ~~README-DEV~~ — incorporado em `docs/reference/README-DEV_AUDITORIA_TECNICA.md`.
 3. **Supabase MCP** não está conectado nesta sessão; verificação somente leitura do projeto pendente.
-4. Decisões de produto fechadas em 2026-10-23 (ver `docs/DECISIONS.md` e `docs/specs/`). Pendências menores: confirmar "retorno positivo" = gostei **e** útil; comprovação de posse de domínio (padrão proposto na D-023); padrão de URL do ClickDesk e qual número é o protocolo (DOM recebido, ver `specs/EXTENSAO_CAPTURA.md` §7); confirmar D-024; primeiro adaptador de provedor de IA (pode ficar para a Fase 3).
+4. Decisões de produto fechadas em 2026-10-23 (ver `docs/DECISIONS.md` e `docs/specs/`). Pendências menores: confirmar "retorno positivo" = gostei **e** útil; primeiro adaptador de provedor de IA (pode ficar para a Fase 3).
 5. Acesso à aplicação original no Base44 (somente leitura) para capturas de tela de referência (P-39).
 
 ## Registro de revisões
