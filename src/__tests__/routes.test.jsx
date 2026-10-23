@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
@@ -27,6 +27,12 @@ describe('rotas provisórias', () => {
     expect(screen.getByRole('heading', { level: 1, name: title })).toBeInTheDocument()
     expect(screen.getByText('Em construção.')).toBeInTheDocument()
     expect(Boolean(screen.queryByRole('main'))).toBe(hasLayout)
+    if (hasLayout) {
+      expect(within(screen.getByRole('main')).getByRole('heading', { level: 1, name: title })).toBeInTheDocument()
+      expect(screen.getByRole('navigation', { name: 'Navegação principal (desktop)' })).toBeInTheDocument()
+    } else {
+      expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+    }
   })
 
   it('o botão da 404 navega para o painel como link acessível', async () => {
