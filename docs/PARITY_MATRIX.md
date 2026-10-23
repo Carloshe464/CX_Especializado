@@ -7,7 +7,7 @@ Itens **Alterado** seguem a nova regra decidida pelo responsável (não a REF) e
 Status: ⬜ Não iniciado · 🟨 Em andamento · 🟦 Implementado (sem evidência) · ✅ Verificado · ⛔ Bloqueado
 REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 
-**Paridade atual comprovada: 15 / 102 itens (14,7%)** — TASK-001 (PR #2) e TASK-002 (PR #4) mescladas.
+**Paridade atual comprovada: 18 / 102 itens (17,6%)**, com TASK-001 (PR #2), TASK-002 (PR #4) e TASK-003 (PR #8) mescladas.
 
 ## Fundação e visual
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
@@ -15,10 +15,10 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | V-01 | `index.html` `lang="pt-BR"`, título "Protocolo de Inteligência CX", Fraunces + Inter | §9.3 | Visual | Paridade | `html.test.js` (PR #2) | ✅ |
 | V-02 | Tokens HSL `:root` exatos | §9.1 | Visual | Paridade | `tokens.test.js` (PR #2) | ✅ |
 | V-03 | `tailwind.config.js`: cores por token, radius, fontes, opacity 1%, animate | §9.2 | Visual | Paridade | revisão PR #2 + build CI | ✅ |
-| V-04 | Layout: sidebar `w-64` ≥ lg, logo `HeartHandshake`, e-mail + papel + Sair | §8 Layout | Visual | Paridade | teste de componente + screenshot | ⬜ |
-| V-05 | Topbar mobile sticky com pills; ativo `bg-primary` | §8 Layout | Visual | Paridade | screenshot mobile | ⬜ |
-| V-06 | Itens de menu por papel (Painel, Avaliações, Nova avaliação, Curadoria, Satisfação, Protocolo, Meu desenvolvimento) | §8 Layout | Funcional | Paridade | teste por papel | ⬜ |
-| V-07 | Cards `rounded-2xl border bg-card`, títulos `font-heading`, placeholders dashed, `Loader2` | §8 | Visual | Paridade | screenshot | ⬜ |
+| V-04 | Layout: sidebar `w-64` ≥ lg, logo `HeartHandshake`, e-mail + papel + Sair | §8 Layout | Visual | Paridade | `layout.test.jsx` + captura 1280 px (PR #8) | ✅ |
+| V-05 | Topbar mobile sticky com pills; ativo `bg-primary` | §8 Layout | Visual | Paridade | captura 375 px + medidas de scrollWidth (PR #8) | ✅ |
+| V-06 | Itens de menu por papel (Painel, Avaliações, Nova avaliação, Curadoria, Satisfação, Protocolo, Meu desenvolvimento) | §8 Layout | Funcional | Paridade | `layout.test.jsx` (listas por papel, PR #8); controle de acesso real na TASK-012/014 | ✅ |
+| V-07 | Cards `rounded-2xl border bg-card`, títulos `font-heading`, placeholders dashed, `Loader2` | §8 | Visual | Paridade | StatCard/EmptyState/LoadingSpinner (PR #8); falta comparar com capturas da referência | 🟨 |
 | V-08 | Estilos de badges (classificação, gravidade, tendência, status) | §5 | Visual | Paridade | classes literais testadas em `cx.test.js` (PR #4); falta render/snapshot | 🟨 |
 | V-09 | UI integralmente em pt-BR; datas `pt-BR` | §2 | Visual | Paridade | revisão + teste formatDate | ⬜ |
 | V-10 | Sem erros de console; build ESM sem `require` | §12 | Técnico | Paridade | lint anti-`require` ✅ (PR #2); console sem erros ⬜ (e2e) | 🟨 |
@@ -115,9 +115,9 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | P-35 | CsatPanel: geração de link de pesquisa com copiar | §8 | Funcional | Paridade (token no servidor) | teste | ⬜ |
 | P-36 | SpreadsheetImport: máquina de estados e coluna "O que será feito" | §8 | Funcional | Paridade | teste | ⬜ |
 | P-37 | Mensagens de falha de IA acionáveis | — | Robustez | D-007#8 | teste | ⬜ |
-| P-38 | Responsividade (sidebar ≥ lg, pills abaixo) | §12 | Visual | Paridade | screenshots 375/768/1280 | ⬜ |
+| P-38 | Responsividade (sidebar ≥ lg, pills abaixo) | §12 | Visual | Paridade | capturas 375/1280 (PR #8); falta 768 | 🟨 |
 | P-39 | Comparação visual com a aplicação original | — | Visual | — | screenshots lado a lado *[requer acesso à app Base44]* | ⬜ |
-| P-40 | ScoreList, StatCard, CompetencyCard, OpportunityCard conforme REF | §8 | Visual | Paridade | snapshot | ⬜ |
+| P-40 | ScoreList, StatCard, CompetencyCard, OpportunityCard conforme REF | §8 | Visual | Paridade | StatCard (PR #8); demais componentes na Fase 4 | 🟨 |
 | P-41 | Fluxo ponta a ponta: registrar → analisar → curar → analista vê aprovado → CSAT | §1 | Funcional | Paridade | e2e | ⬜ |
 | P-42 | Supervisor lê tudo | §1 | Funcional | Paridade | matriz RLS | ⬜ |
 | P-43 | Cálculos de indicadores conferidos contra dataset de referência | §7.1 | Funcional | — | teste | ⬜ |
