@@ -34,6 +34,8 @@
 
 Único: `(analysis_run_id, target_type, opportunity_id, author_role)`, com um veredito vigente por papel. A view `effective_feedback` calcula V4.
 
+> **Regra confirmada (D-024, 2026-10-23):** a validação do analista vale por padrão. A revisão do supervisor é opcional e, quando existe, sobrepõe a do analista.
+>
 > **Refinamento (D-024):** a coluna `adjusted_recommendation` fica em `opportunities`, não aqui. O veredito do supervisor é a decisão de curadoria (`opportunities.status`, `evaluations.diagnosis_status`). As linhas de supervisor em `analysis_feedback` são opcionais e servem só à taxa de utilidade.
 
 ## 3. Estados exibidos (proposta do orquestrador)
