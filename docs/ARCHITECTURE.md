@@ -75,7 +75,7 @@ Convenções: `id uuid pk default gen_random_uuid()`, `created_at`, `updated_at`
 |---|---|---|
 | `organizations`, `memberships`, `platform_admins`, `profiles` | gestão de usuários | §3 |
 | `analysis_feedback` | nova (D-011) | validação do analista e veredito do supervisor por diagnóstico/oportunidade; view `effective_feedback` |
-| `ai_provider_configs` | nova (D-009) | provedor, URL, modelo, referência ao segredo no Vault, por organização ❓ |
+| `ai_provider_configs` | nova (D-009) | provedor, URL, modelo, referência ao segredo no Vault, **por organização** |
 | `evaluations` | §4.1 | `organization_id`; `analyst_user_id` FK `profiles` (analista escolhido pelo supervisor, D-013); `status` (rascunho/transcrito/analisado/curado); `diagnosis_status` (pendente/aprovado/rejeitado); campos de diagnóstico da IA **movidos para `analysis_runs`** (D-010) ou protegidos por view; `protocol` único por `(organization_id, lower(btrim(protocol)))` (D-012) |
 | `analysis_runs` | nova (correção #3) | uma linha por execução da IA: `prompt_version`, `model`, `status` (sucesso/falha), `raw_output` (jsonb), `trend`, `strengths`, `summary_feedback`, `uncertainties`, `error_code`. Reanálise cria nova execução; decisões de curadoria anteriores não são apagadas |
 | `evaluation_scores` | §4.2 | FK `evaluation_id`, `analysis_run_id`; `score numeric(4,2) null check 0..10`; `classification` derivada por função SQL (mesma regra de `scoreClassification`) |
@@ -110,6 +110,7 @@ Políticas de UPDATE diretas nas colunas de curadoria são negadas a todos os pa
 
 Pipeline na Edge Function `analyze-evaluation`, em módulos independentes do provedor:
 
+0. **Versão do protocolo:** V1.1 (linha de base, verbatim) e V1.2 (+ comunicação assertiva e rapport, D-019); versão ativa por organização.
 1. **Entrada:** carrega a transcrição (servidor), valida que o chamador pode analisar a avaliação. **Não carrega CSAT** (regra 4.5/§8).
 2. **Prompt versionado:** `PROTOCOL_PROMPT V1.1` verbatim (REF §6.2) armazenado em arquivo versionado + `protocol_versions`; `prompt_version` registrado na execução.
 3. **Adaptador de provedor:** interface `generateStructured({ prompt, schema, files? })`; provedor, URL, modelo e chave lidos de `ai_provider_configs` + Vault, configurados pela interface (D-009, `docs/specs/PROVEDOR_IA.md`).

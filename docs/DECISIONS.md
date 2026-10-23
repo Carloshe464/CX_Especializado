@@ -23,6 +23,7 @@ Toda correção de comportamento da aplicação original deve aparecer aqui, cit
 | D-016 | Reanálise pelo dono ou supervisor, com histórico | Aceita (2026-10-23) |
 | D-017 | Papéis: admin da plataforma, supervisor, analista | Aceita (detalhes em aberto) |
 | D-018 | Extensão de navegador para captura de atendimentos | Aceita (escopo); especificação em aberto |
+| D-019 | Protocolo V1.2: comunicação assertiva e rapport nas oportunidades | Aceita (requisito); texto do prompt em aprovação |
 
 ---
 
@@ -84,7 +85,7 @@ Contexto original:
 REF §11.8 indica convite pela plataforma, mas existe `/register`. O README-DEV (§0.3, A.8, B.10) confirma no original: e-mail/senha, **Google OAuth**, registro com OTP, reset de senha, e entrada de usuários **por convite**. Proposta: manter a rota `/register` (paridade), todo cadastro nasce com `role='user'`, papel `admin` atribuído somente por supervisor existente; avaliar com o responsável se o signup público deve ser desativado em produção.
 
 ### D-009 — IA plugável configurada pela interface *(Aceita em 2026-10-23)*
-**Decisão:** o provedor ainda não foi escolhido e o modelo será o da API conectada. Uma tela de configuração permite informar provedor, endpoint, modelo e chave; o motor usa adaptadores (inicialmente: protocolo compatível com OpenAI, que cobre vários provedores e servidores locais, e adaptadores nativos conforme a escolha). Modelos locais ficam para bem depois. Especificação: `docs/specs/PROVEDOR_IA.md`.
+**Decisão:** o provedor ainda não foi escolhido e o modelo será o da API conectada. Uma tela de configuração permite informar provedor, endpoint, modelo e chave; o motor usa adaptadores (inicialmente: protocolo compatível com OpenAI, que cobre vários provedores e servidores locais, e adaptadores nativos conforme a escolha). **Chave por organização** (resposta de 2026-10-23): cada empresa informa e paga a própria API. Modelos locais: **em stand-by**. Especificação: `docs/specs/PROVEDOR_IA.md`.
 **Segurança:** a chave é gravada só no servidor (cifrada, Supabase Vault), nunca retorna ao navegador (campo somente escrita, exibe apenas os 4 últimos caracteres) e só a Edge Function a lê.
 
 Contexto original:
@@ -149,3 +150,7 @@ O cadastro é self-service. *Em aberto:* como um novo usuário entra na organiza
 - identifica o arquivo pelo número do atendimento/ticket extraído da URL, chave pela qual o sistema será alimentado.
 
 Especificação e perguntas: `docs/specs/EXTENSAO_CAPTURA.md`. É um produto separado (pasta `extension/`), planejado como trilha própria após a Fase 4.
+
+### D-019 — Protocolo V1.2: comunicação assertiva e rapport nas oportunidades *(Aceita como requisito em 2026-10-23)*
+**Decisão do responsável:** o bloco de oportunidades de melhoria deve usar comunicação clara e efetiva, com técnicas de comunicação assertiva e de rapport.
+**Implementação:** nova versão do prompt (V1.2), que acrescenta uma seção à V1.1 sem remover regras. A V1.1 continua verbatim como linha de base de paridade. Novo campo `communication_techniques` por oportunidade. Texto proposto em `docs/specs/PROTOCOLO_PROMPT_V1.2.md`, aguardando aprovação.

@@ -31,7 +31,7 @@ Saída: matriz RLS 100% verde localmente (S-01…S-08, S-10); autorização regi
 
 ## Fase 3 — Motor CX 1.1
 **Pré-requisito:** escolha do primeiro provedor a suportar (D-009) e se a chave é por organização.
-TASK-020 adaptadores de provedor + schemas de validação · TASK-025 tela e Edge Function de configuração do provedor (Vault, testar conexão) · TASK-021 prompts versionados (hash verbatim) · TASK-022 Edge Function `analyze-evaluation` com persistência transacional e tratamento de falhas · TASK-023 `extract-transcript` (visão) · TASK-024 suíte de transcrições sintéticas.
+TASK-020 adaptadores de provedor + schemas de validação · TASK-025 tela e Edge Function de configuração do provedor (Vault, testar conexão) · TASK-021 prompts versionados V1.1 e V1.2 (hash verbatim; D-019) · TASK-022 Edge Function `analyze-evaluation` com persistência transacional e tratamento de falhas · TASK-023 `extract-transcript` (visão) · TASK-024 suíte de transcrições sintéticas.
 Saída: A-01…A-09 verificados com mocks e com ao menos uma execução real autorizada.
 
 ## Fase 4 — Fluxo principal

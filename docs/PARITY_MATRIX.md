@@ -149,3 +149,4 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | N-09 | "Analisar ao vivo" na extensão | D-018 | specs/EXTENSAO_CAPTURA | ⬜ |
 | N-10 | Ingestão por número do ticket (URL) | D-018, D-012 | specs/EXTENSAO_CAPTURA | ⬜ |
 | N-11 | Modelos locais de IA | D-009 (futuro distante) | specs/PROVEDOR_IA §4 | 💤 |
+| N-12 | Oportunidades com comunicação assertiva e rapport (Protocolo V1.2) + campo `communication_techniques` | D-019 | specs/PROTOCOLO_PROMPT_V1.2 | ⬜ |

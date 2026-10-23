@@ -15,7 +15,7 @@ O modelo usado é determinado pela API conectada. Uma tela de configuração per
 | Suporte a imagens (visão) | detectado ou declarado; habilita a extração de prints e PDF |
 | Botão "Testar conexão" | Edge Function faz uma chamada mínima e valida a saída JSON estruturada |
 
-Acesso: supervisor da organização e admin da plataforma ❓.
+Acesso: supervisor da organização e admin da plataforma ❓. Sem configuração ativa, a análise fica indisponível com a mensagem "Configure a chave de IA da organização em Configurações".
 
 ## 3. Armazenamento e execução
 - `ai_provider_configs(organization_id, provider, base_url, model, supports_vision, secret_ref, is_active, updated_by, updated_at)`.
@@ -28,5 +28,6 @@ Acesso: supervisor da organização e admin da plataforma ❓.
 Um servidor local (ex.: compatível com OpenAI rodando no computador do analista) **não é alcançável** pelas Edge Functions na nuvem. Opções futuras: endpoint exposto pela empresa com TLS e autenticação, ou execução local via extensão/agente desktop. Fica fora do escopo até nova decisão.
 
 ## 5. Perguntas abertas
-1. ❓ A chave é **por organização** (cada empresa usa e paga a própria API; recomendado em cadastro aberto) ou **global** da plataforma, configurada só por você?
-2. ❓ Se global: há limite de uso por organização?
+1. ✅ **Por organização** (decidido em 2026-10-23): cada empresa informa a própria chave.
+2. ✅ Modelos locais: **stand-by**.
+3. ❓ Quem configura na organização: só o supervisor? (proposta: sim, mais o admin da plataforma para suporte)
