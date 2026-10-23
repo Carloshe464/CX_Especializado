@@ -140,7 +140,14 @@ No original, "Reanalisar" aparece também em `curado`, apaga oportunidades curad
 - **Supervisor**, por organização: vê e avalia tudo da organização.
 - **Analista**, por organização: pertence a uma única organização.
 
-O cadastro é self-service. *Em aberto:* como um novo usuário entra na organização certa (criar organização ao se cadastrar e virar supervisor; convite por link; domínio de e-mail). O papel global fica numa tabela própria (`platform_admins`), gerenciada só pelo banco/painel, nunca pelo cliente.
+O cadastro é self-service. **Entrada (respostas de 2026-10-23):** quem cria a empresa vira supervisor dela; os analistas entram **pelo domínio do e-mail**.
+**Proteções obrigatórias da entrada por domínio:**
+- só e-mail **verificado** (Google ou confirmação por e-mail);
+- domínios públicos (gmail.com, outlook.com, hotmail.com, yahoo.com etc.) **nunca** servem de domínio de empresa;
+- um domínio pertence a uma única organização (`organization_domains`, único);
+- quem entra por domínio vira **analista**; promover a supervisor só pelo supervisor ou pelo admin geral.
+
+*Em aberto:* comprovar a posse do domínio (ex.: registro DNS) ou aceitar o domínio do e-mail verificado do criador. O papel global fica numa tabela própria (`platform_admins`), gerenciada só pelo banco/painel, nunca pelo cliente.
 
 ### D-018 — Extensão de captura de atendimentos *(Aceita no escopo; especificação em aberto)*
 **Decisão do responsável:** extensão de navegador, semelhante à Neeko, que:

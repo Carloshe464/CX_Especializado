@@ -35,6 +35,7 @@ Regras obrigatórias para todos os agentes. Cada regra tem um identificador usad
 | SEC-18 | Isolamento total entre organizações (inclusive supervisor); só `platform_admins` cruza organizações | RLS + teste |
 | SEC-19 | Chave da API de IA cifrada no servidor (Vault); nunca devolvida ao navegador; troca só por supervisor/admin | Edge Function + RLS |
 | SEC-20 | Extensão: token de sessão com escopo mínimo, sem chave de IA; arquivos locais só na pasta escolhida; envio ao sistema só por ação/regra explícita | revisão da extensão |
+| SEC-22 | Entrada por domínio: e-mail verificado, domínios públicos bloqueados, domínio único por organização, entrada sempre como analista | trigger/Edge Function de onboarding + teste |
 | SEC-21 | Transcrições contêm dados pessoais de clientes: aviso de privacidade (LGPD), retenção definida e exclusão sob demanda | política + implementação |
 
 ## Testes exigidos (a partir da Fase 2)

@@ -1,6 +1,6 @@
 # Especificação — Extensão de captura de atendimentos (D-018)
 
-> Status: **escopo aceito**; especificação depende das respostas da §6. Produto separado em `extension/`.
+> Status: **escopo aceito** (respostas de 2026-10-23); detecção de fim de atendimento em stand-by. Produto separado em `extension/`.
 
 ## 1. Objetivo
 Capturar a transcrição dos atendimentos no navegador do analista, salvá-la em `.txt` numa pasta do computador dele e alimentar o Protocolo CX usando o **número do atendimento/ticket extraído da URL** como chave (= `protocol`, único por organização, D-012).
@@ -16,12 +16,16 @@ Capturar a transcrição dos atendimentos no navegador do analista, salvá-la em
 | E6 | Funcionamento semelhante à extensão Neeko (referência do responsável) |
 
 ## 3. Desenho técnico proposto
-- **Plataforma:** extensão Manifest V3 para navegadores Chromium (Chrome/Edge), com painel lateral (side panel) para a interface.
+- **Plataforma de atendimento:** **ClickDesk**, com captura por *scraping* leve do DOM da página (somente leitura, sem automação de cliques nem chamadas a APIs internas).
+- **Navegadores:** Chromium com Manifest V3: Chrome, Edge, **Brave** e **Opera**. O Opera não suporta `sidePanel`, então a interface deve funcionar também como popup; testar a File System Access API em cada um.
+- **Referência Neeko:** reproduzir a captura de dados e o salvamento automático.
 - **Captura:** *content script* com um **adaptador por plataforma de chat**: seletores de mensagens, autor (Atendente/Cliente), horário e detecção de "atendimento finalizado". Regex configurável para extrair o ticket da URL.
 - **Multiatendimento:** captura simultânea de vários tickets (4+ conversas), um arquivo por ticket.
 - **Formato do `.txt`:** cabeçalho (ticket, canal, analista, início/fim) e linhas `Atendente: ...` / `Cliente: ...`, mesmo formato usado pela IA. Cada gravação reescreve o arquivo com a transcrição completa até o momento, evitando mensagens duplicadas.
 - **Pasta local:** File System Access API (`showDirectoryPicker`) com o identificador persistido. O navegador pode pedir reautorização após reiniciar; a interface mostra "Reautorizar pasta". Alternativa: subpasta de Downloads via `chrome.downloads`.
-- **Envio ao sistema:** autenticação na conta do Protocolo CX; chama uma Edge Function que cria ou atualiza a avaliação pelo ticket e, no "Analisar ao vivo", dispara a análise e mostra o link do resultado. A extensão **nunca** guarda chave de IA (SEC-20).
+- **Salvamento automático:** **somente grava o `.txt`** localmente; a ingestão é feita depois, pela importação de `.txt` na plataforma (nova função N-13: importar um ou vários `.txt`, usando o número do ticket do nome/cabeçalho como protocolo).
+- **Detecção de fim de atendimento:** *stand-by*. Até lá, regravação do `.txt` a cada nova mensagem (com debounce) e ao trocar de ticket ou fechar a aba.
+- **Analisar ao vivo:** autenticação na conta do Protocolo CX; envia a transcrição até a última mensagem a uma Edge Function, que cria ou atualiza a avaliação pelo ticket e dispara a análise. **O resultado aparece só no site**; a extensão mostra um link. A extensão **nunca** guarda chave de IA (SEC-20).
 - **Privacidade:** os arquivos contêm dados pessoais de clientes; aviso LGPD e política de retenção (SEC-21).
 
 ## 4. Estados da interface
@@ -31,9 +35,10 @@ Sem pasta → Aguardando atendimento → Capturando (ticket N, X mensagens) → 
 Fase 2 (auth + organizações), Fase 3 (motor de IA) e a Edge Function de ingestão. Trilha própria após a Fase 4.
 
 ## 6. Perguntas abertas
-1. ❓ Em qual(is) plataforma(s) de atendimento a extensão vai rodar (nome do sistema) e qual é o formato da URL com o número do ticket (um exemplo sem dados reais)?
-2. ❓ Como se detecta que o atendimento foi finalizado nessa plataforma (botão "encerrar", mudança de status, fechamento da aba)?
-3. ❓ O salvamento automático também envia a transcrição ao sistema, ou só grava o `.txt`, que depois é importado na plataforma?
-4. ❓ "Analisar ao vivo" cria a avaliação no sistema e já mostra o resultado na extensão, ou só no site?
-5. ❓ Navegador: só Chrome/Edge é suficiente?
-6. ❓ Referência "Neeko": o que exatamente se quer copiar dela (visual, painel lateral, comportamento)?
+1. ✅ ClickDesk, com scraping leve. ❓ Ainda falta um **exemplo de URL** com o número do ticket (sem dados reais) e acesso a uma conta de teste/página exemplo para mapear o DOM.
+2. ⏸️ Detecção de fim de atendimento: stand-by.
+3. ✅ Só grava o `.txt`, para importar depois.
+4. ✅ A princípio, resultado só no site.
+5. ✅ Chrome, Edge, Brave e Opera.
+6. ✅ Neeko: captura de dados e salvamento automático.
+7. ⚠️ Verificar os termos de uso do ClickDesk quanto a extensões e coleta de dados da página (risco contratual, não técnico).

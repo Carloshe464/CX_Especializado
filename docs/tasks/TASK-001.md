@@ -16,6 +16,9 @@
 
 Você é o operador de desenvolvimento do projeto **Protocolo CX 1.1** no repositório `Carloshe464/CX_Especializado`. Siga `AGENTS.md` integralmente. Sua tarefa é a **TASK-001 — Fundação React/Vite/Supabase**: criar a base local do frontend. **Não implemente telas reais, autenticação, banco de dados nem IA.**
 
+### 0. Pré-condição
+Crie a branch `task/001-fundacao` a partir da `main` atualizada. Se `docs/reference/README-DEV_AUDITORIA_TECNICA.md` **não existir** na `main`, pare e reporte: significa que os documentos de governança ainda não foram integrados.
+
 ### 1. Leitura obrigatória antes de começar
 - `AGENTS.md`, `docs/SECURITY.md`, `docs/DECISIONS.md` (D-003, D-004, D-005, D-006).
 - `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md` §2, §3 e §9 e `docs/reference/README-DEV_AUDITORIA_TECNICA.md` §A.2–A.4 e §E.1 (stack, rotas e design system reais da aplicação original).

@@ -1,6 +1,6 @@
 # Especificação — Validação e curadoria (D-011)
 
-> Status: **rascunho aceito no conceito**; itens marcados ❓ aguardam confirmação do responsável.
+> Status: **aceito** (respostas de 2026-10-23); um ponto ⚠️ precisa de esclarecimento.
 > Substitui o modelo original em que nada da IA chegava ao analista antes da aprovação do supervisor.
 
 ## 1. Regras
@@ -10,7 +10,7 @@
 | V2 | O analista valida o **diagnóstico** e **cada oportunidade**: `gostei` (sim/não), `útil` (sim/não) e comentário opcional | responsável |
 | V3 | O supervisor vê tudo da organização, inclusive as validações dos analistas, e registra o próprio veredito nos mesmos alvos | responsável |
 | V4 | **O veredito do supervisor prevalece.** Veredito efetivo = supervisor, se existir; senão, analista; senão, "sem validação" | responsável |
-| V5 | "Meu desenvolvimento" mostra só itens com veredito efetivo **positivo** | responsável (interpretação ❓) |
+| V5 | "Meu desenvolvimento" mostra só itens com veredito efetivo **positivo**, inclusive os positivos pelo analista ainda sem veredito do supervisor (para alinhamento) | responsável |
 | V6 | Taxa de utilidade da IA nos indicadores; o analista vê só a das próprias avaliações, o supervisor vê a da organização e por analista | responsável |
 | V7 | O analista pode mudar a própria validação; nunca a do supervisor nem a de outro analista | segurança |
 | V8 | Toda gravação de veredito do supervisor gera `curation_logs` (imutável) | original + SEC-08 |
@@ -29,16 +29,16 @@
 | `author_role` | `analista` \| `supervisor` | de `memberships`, nunca do cliente |
 | `liked`, `useful` | boolean | |
 | `comment` | text | |
-| `adjusted_recommendation` | text null | só supervisor ❓ |
+| `adjusted_recommendation` | text null | só supervisor, **opcional**: por padrão vale o texto da IA |
 | `created_at`, `updated_at` | timestamptz | |
 
 Único: `(analysis_run_id, target_type, opportunity_id, author_role)`, com um veredito vigente por papel. A view `effective_feedback` calcula V4.
 
-## 3. Estados exibidos ❓
+## 3. Estados exibidos (proposta do orquestrador)
 Proposta: manter os rótulos originais. `analisado` = "Em curadoria", até o supervisor dar veredito no diagnóstico; aí vira `curado` = "Curadoria concluída". A validação do analista não muda o status. A fila de Curadoria prioriza avaliações cujo analista marcou algo como "não útil".
 
 ## 4. Perguntas abertas
-1. ❓ O que é "retorno positivo" (V5): `útil = sim`? `gostei = sim` **e** `útil = sim`?
-2. ❓ V5: item **sem** veredito do supervisor, mas positivo pelo analista, aparece em "Meu desenvolvimento"? A proposta é **sim**.
-3. ❓ O supervisor ainda pode **ajustar** a recomendação de uma oportunidade (texto alternativo exibido ao analista), como no original?
-4. ❓ O analista vê o veredito e o comentário do supervisor quando são contrários aos dele?
+1. ⚠️ "Retorno positivo": a resposta foi "sim" a uma pergunta com duas opções. **Interpretação adotada até confirmação: `gostei = sim` E `útil = sim`.**
+2. ✅ Sim: item positivo pelo analista sem veredito do supervisor aparece, inclusive para alinhamento.
+3. ✅ Sim, o supervisor pode ajustar a recomendação, mas o padrão é o texto da IA; o ajuste é opcional.
+4. ✅ Sim, o analista vê o veredito e o comentário do supervisor.
