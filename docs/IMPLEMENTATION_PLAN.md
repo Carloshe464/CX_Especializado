@@ -18,6 +18,7 @@ Pendências que **não bloqueiam a Fase 1**: Supabase MCP indisponível nesta se
 Saída: build e validações locais verdes (CI manual, D-021); V-01…V-03, V-09, V-10, R-01, R-07, D-01…D-07, P-48, P-49 verificados.
 
 ## Fase 2 — Banco e autenticação
+**Exceção autorizada pelo responsável (2026-10-23):** a TASK-010 roda em paralelo com a TASK-003, porque mexem em arquivos disjuntos. As demais tarefas da fase seguem a ordem de `docs/TASKS.md`.
 **Pré-requisitos:** Fase 1 verificada; Supabase CLI disponível para o operador (testes locais). Decisões de produto já tomadas (D-002, D-008, D-011, D-012, D-013, D-017).
 | Tarefa | Escopo |
 |---|---|

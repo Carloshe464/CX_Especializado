@@ -35,10 +35,45 @@ Sem pasta → Aguardando atendimento → Capturando (ticket N, X mensagens) → 
 Fase 2 (auth + organizações), Fase 3 (motor de IA) e a Edge Function de ingestão. Trilha própria após a Fase 4.
 
 ## 6. Perguntas abertas
-1. ✅ ClickDesk, com scraping leve. ❓ Ainda falta um **exemplo de URL** com o número do ticket (sem dados reais) e acesso a uma conta de teste/página exemplo para mapear o DOM.
+1. ✅ ClickDesk, com scraping leve. ✅ Estrutura do DOM recebida em 2026-10-23 (mapa anonimizado na §7). ❓ Falta o **padrão da URL** da página do ticket e qual número é o protocolo (ver §7.3).
 2. ⏸️ Detecção de fim de atendimento: stand-by.
 3. ✅ Só grava o `.txt`, para importar depois.
 4. ✅ A princípio, resultado só no site.
 5. ✅ Chrome, Edge, Brave e Opera.
 6. ✅ Neeko: captura de dados e salvamento automático.
 7. ⚠️ Verificar os termos de uso do ClickDesk quanto a extensões e coleta de dados da página (risco contratual, não técnico).
+
+## 7. Mapa do DOM do ClickDesk (recebido em 2026-10-23, anonimizado)
+> O HTML original tinha dados pessoais e links assinados; **nada dele foi versionado**. Abaixo, só a estrutura. Aplicação em Vue + PrimeVue + Tailwind; os atributos `data-v-xxxxxxxx` mudam a cada build e **não devem** ser usados como seletor.
+
+### 7.1 Cabeçalho do ticket — `#ticket-header`
+- **Título:** `h1 > span.truncate` (assunto).
+- **Linha de metadados:** spans irmãos separados por `·`:
+  - número de exibição `#NNNNNNN`, no `span` com `tabular-nums`;
+  - canal (ex.: "Chat no site");
+  - marca;
+  - "aberto dd/mm/aaaa, hh:mm";
+  - indicador "Online agora".
+
+### 7.2 Mensagens — contêiner rolável com filhos `div[id^="msg-"]`
+| Elemento | Como identificar |
+|---|---|
+| Lado | classe `items-start` = cliente; `items-end` = equipe (atendente humano **ou** bot) |
+| Autor | primeiro `span.font-medium` da linha de cabeçalho da mensagem; o bot aparece como **"Sistema"** |
+| Horário | `span` com texto `· dd/mm/aaaa, hh:mm`; recibo de leitura em `[aria-label^="Lida ·"]` |
+| Texto do cliente | `.md-body` |
+| Texto da equipe | `.msg-html` (HTML com `p`, `ol`, `ul`, `strong`) → converter para texto simples preservando listas |
+| Resposta citada | `button` com `border-l-4` dentro do balão → **excluir** do texto, ou registrar como "(em resposta a: …)" |
+| Anexos | `img[data-zoom-name]` e `a` com ícone `pi-paperclip` → registrar só o nome do arquivo, **nunca** a URL assinada |
+| Eventos do sistema | `div.flex.justify-center > span.rounded-full` (ex.: triagem, transferência da IA para humano) |
+| Ações da UI | `.msg-action` (responder, ocultar, curtir) → ignorar |
+
+### 7.3 Pontos em aberto
+- O número exibido no cabeçalho (`#NNNNNNN`) **difere** do id interno que aparece nos caminhos dos anexos (`/tickets/<id>/`). Confirmar qual é o protocolo e qual aparece na URL da página.
+- **Formato do `.txt`** (proposta, derivada):
+  - `Atendente:` para o analista humano;
+  - `Cliente:` para o cliente;
+  - `Bot:` para mensagens do "Sistema";
+  - `[Evento]` para avisos centrais.
+  - Assim a IA não atribui ao analista as falas do bot.
+- **Saída do bot:** o handoff aparece como evento "Transferido pela IA…" e é o marco de início do atendimento humano.

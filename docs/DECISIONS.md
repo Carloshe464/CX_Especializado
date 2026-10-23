@@ -27,6 +27,8 @@ Toda correção de comportamento da aplicação original deve aparecer aqui, cit
 | D-020 | Risco aceito: alertas moderados do Tailwind 3 (build) | Aceita (2026-10-23) |
 | D-021 | GitHub Actions sem execução automática | Aceita (2026-10-23) |
 | D-022 | Risco aceito: ESLint 9 (EOL) até o `eslint-plugin-react` suportar a v10 | Aceita (2026-10-23) |
+| D-023 | Domínio da empresa = domínio do e-mail verificado do criador (sem prova DNS por ora) | Proposta (padrão adotado na TASK-010) |
+| D-024 | Veredito do supervisor = decisão de curadoria; feedback gostei/útil em `analysis_feedback` | Proposta (adotada na TASK-011) |
 
 ---
 
@@ -178,3 +180,21 @@ Especificação e perguntas: `docs/specs/EXTENSAO_CAPTURA.md`. É um produto sep
 **Contexto:** a política oficial (https://eslint.org/version-support) marca o ESLint 9 como EOL desde 2026-08-06. A versão estável atual do `eslint-plugin-react` (7.37.5) declara `peerDependencies.eslint` até `^9.7`, o que impede a v10 sem `--force` ou troca de plugin (vedados pela TASK-004).
 **Decisão:** manter `eslint` e `@eslint/js` em 9.39.5. O ESLint só roda no desenvolvimento e não vai para o bundle. O aviso `deprecated` do `npm ci` é esperado.
 **Reavaliação:** quando o `eslint-plugin-react` publicar uma versão estável com peer `^10`, abrir uma tarefa de manutenção para migrar.
+
+### D-023 — Posse do domínio da empresa *(Proposta; padrão adotado na TASK-010)*
+**Contexto:** a D-017 deixou em aberto se a posse do domínio precisa ser comprovada (ex.: registro DNS).
+**Proposta:** por ora, o domínio só pode ser registrado se for **exatamente** o domínio do e-mail **verificado** de quem cria a empresa. Domínios públicos são bloqueados e cada domínio pertence a uma única organização. A verificação por DNS fica como evolução futura: basta acrescentar `verified_at`/`verification_token` em `organization_domains`, sem quebrar o modelo.
+**Risco residual:** qualquer pessoa com e-mail verificado do domínio pode criar a empresa antes do dono legítimo. Mitigação: o admin da plataforma pode transferir ou remover o domínio.
+
+### D-024 — Como o veredito do supervisor é gravado *(Proposta; adotada na TASK-011)*
+**Contexto:** a D-011 pede veredito do supervisor prevalecendo sobre a validação do analista, e o original já tem curadoria aprovar/ajustar/rejeitar.
+**Proposta:**
+- O veredito do supervisor **é a decisão de curadoria**, com paridade de interface e de `curation_logs`:
+  - na oportunidade, `opportunities.status` (`aprovada`/`ajustada`/`rejeitada`) + `supervisor_note` + `adjusted_recommendation`, este opcional (padrão = texto da IA);
+  - no diagnóstico, `evaluations.diagnosis_status` + `supervisor_review`.
+- `analysis_feedback` guarda o gostei/útil/comentário do **analista** e, opcionalmente, do supervisor (usado na taxa de utilidade da IA).
+- **Veredito efetivo:**
+  - se houver decisão do supervisor: `aprovada`/`ajustada`/`aprovado` → positivo; `rejeitada`/`rejeitado` → negativo;
+  - senão, vale o feedback do analista: `gostei` e `útil` = positivo (interpretação pendente da VALIDACAO §4.1);
+  - senão, "sem validação".
+- A view `effective_feedback` e as RPCs entram na TASK-012.
