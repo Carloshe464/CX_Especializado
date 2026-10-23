@@ -6,7 +6,7 @@ Toda correção de comportamento da aplicação original deve aparecer aqui, cit
 | ID | Título | Status |
 |---|---|---|
 | D-001 | Orquestração sem mecanismo automático de execução do Codex | Aceita |
-| D-002 | Organização única vs. multiempresa | **Proposta** |
+| D-002 | Multiempresa desde o início | Aceita (2026-10-23) |
 | D-003 | React Router v7 em modo declarativo | Aceita |
 | D-004 | Tailwind CSS v3 (não v4) | Aceita |
 | D-005 | npm como gerenciador de pacotes | Aceita |
@@ -15,12 +15,12 @@ Toda correção de comportamento da aplicação original deve aparecer aqui, cit
 | D-008 | Política de cadastro de usuários | **Proposta** |
 | D-009 | Provedor e modelo de IA | **Proposta** |
 | D-010 | Diagnóstico em `analysis_runs` versionadas | Aceita (fixar na Fase 2) |
-| D-011 | Analista dono não vê análise pendente | **Proposta** (diverge da REF) |
-| D-012 | Unicidade do número de protocolo | **Proposta** |
+| D-011 | Modelo de curadoria e visibilidade do analista | **Em redefinição** pelo responsável |
+| D-012 | Protocolo único por organização | Aceita (2026-10-23) |
 | D-013 | Avaliação criada por supervisor sem analista vinculado | **Proposta** |
 | D-014 | Mecanismo de extração de planilhas | **Proposta** |
 | D-015 | `tailwind-merge` 2.x | Aceita |
-| D-016 | Reanálise de avaliação já curada | **Proposta** |
+| D-016 | Reanálise pelo dono ou supervisor, com histórico | Aceita (2026-10-23) |
 
 ---
 
@@ -29,7 +29,11 @@ Toda correção de comportamento da aplicação original deve aparecer aqui, cit
 **Decisão:** ordens de trabalho são arquivos `docs/tasks/TASK-NNN.md` contendo um prompt completo para colar no Codex ou numa sessão Claude Code operadora. A entrega volta como PR no GitHub, revisado pelo orquestrador.
 **Consequência:** nenhuma execução é simulada; status em `TASKS.md` só muda com evidência no PR.
 
-### D-002 — Organização única vs. multiempresa *(Proposta)*
+### D-002 — Multiempresa desde o início *(Aceita em 2026-10-23 pelo responsável)*
+**Decisão:** opção B. Tabelas `organizations` e `memberships(user_id, organization_id, role)`; toda tabela de negócio recebe `organization_id NOT NULL`; todas as políticas RLS filtram pela organização do usuário; o papel (supervisor/analista) passa a ser **por organização** (em `memberships`, não em `profiles`). Funções centrais: `current_org_ids()`, `is_supervisor(org_id)`. `app_settings` e `protocol_versions` ficam por organização (com seed por organização criada).
+**Consequências:** matriz de testes de RLS inclui isolamento entre organizações (usuário da org A não lê nada da org B, inclusive supervisor); convites, criação de organização e troca de organização ativa precisam de definição de produto (ver perguntas abertas). Cobrança fica fora do escopo.
+
+Análise original das opções:
 **Opções:**
 - **A. Organização única (recomendada):** sem `organization_id`. RLS simples (dono ou supervisor), menos superfície de erro, testes mais baratos. Migrar depois exige: adicionar `organization_id` em todas as tabelas, backfill com a organização padrão, reescrever políticas, escopar `is_supervisor()` por organização e unicidade de protocolo por organização. Esforço estimado moderado, mecânico, se as políticas forem centralizadas em funções.
 - **B. Multiempresa desde já:** `organizations` + `memberships(role)`; toda política filtra por organização. Isolamento entre clientes SaaS pronto, porém dobra a matriz de testes de RLS e antecipa decisões de produto (cobrança, convite, papéis por organização) não autorizadas.
@@ -80,10 +84,17 @@ O original usa `InvokeLLM` sem modelo ("automatic", escolha interna e não inspe
 ### D-010 — Diagnóstico em `analysis_runs`
 Separa o resultado de cada execução da IA da linha da avaliação: permite versionar prompt/modelo, preservar curadorias anteriores (#3) e proteger conteúdo pendente por RLS (#1). A UI continua exibindo os mesmos campos da REF §7.4.
 
-### D-011 — Analista dono não vê análise pendente *(Proposta — diverge da REF)*
+### D-011 — Modelo de curadoria e visibilidade do analista *(Em redefinição)*
+**Resposta do responsável (2026-10-23):** "a aprovação do supervisor se dá a um analista validar a orientação da IA e confirmar se gostou e se foi útil. A questão do supervisor é conseguir visualizar tudo, mas o analista precisa conseguir criar uma avaliação de um chat dele", e haverá novas funções para o fluxo.
+**Impacto:** altera a regra do briefing §4.6 ("o analista não pode acessar resultados pendentes de aprovação") e SEC-06. Como é decisão do responsável sobre regra de produto, prevalece, mas o novo modelo precisa ser especificado antes da Fase 2 (quem valida o quê, o que o supervisor ainda decide, o que alimenta "Meu desenvolvimento" e os indicadores). Texto anterior mantido abaixo como histórico.
+
+Proposta anterior:
 A REF §7.4 define `canSeeAnalysis = isAdmin || isOwner || diagnosis_status==='aprovado'`, com `isOwner = created_by_id === user.id`. Assim, um analista que criou a própria avaliação vê o diagnóstico antes da curadoria, contrariando REF §1 ("nada da IA chega ao analista sem aprovação") e o briefing §4.6. Proposta: `canSeeAnalysis = isSupervisor || diagnosis_status==='aprovado'` (o analista vê o placeholder "em curadoria"). O README-DEV confirma o comportamento (B.12, H.2) e o classifica como decisão de produto a registrar antes de replicar. Precisa de confirmação.
 
-### D-012 — Unicidade do protocolo *(Proposta)*
+### D-012 — Protocolo único por organização *(Aceita em 2026-10-23)*
+**Decisão:** índice único `(organization_id, lower(btrim(protocol)))` quando `protocol` não nulo; criação ou importação com protocolo existente vincula à avaliação existente em vez de duplicar.
+
+Contexto original:
 A REF reutiliza a avaliação por protocolo na importação, mas não impõe unicidade. Proposta: índice único sobre `lower(trim(protocol))` quando não nulo; criação concorrente retorna a avaliação existente. O README-DEV (B.1) confirma que não há chave única e que a deduplicação é só aplicacional na importação (criação manual não deduplica). Confirmar se o mesmo chamado pode ter mais de uma avaliação legítima (ex.: atendimentos distintos com o mesmo protocolo).
 
 ### D-013 — Avaliação criada por supervisor sem analista *(Proposta)*
@@ -95,5 +106,8 @@ O original usa `ExtractDataFromUploadedFile` da plataforma, tolerante a qualquer
 ### D-015 — `tailwind-merge` 2.x
 O original declara `tailwind-merge ^3`, linha voltada ao Tailwind v4, com `tailwindcss 3.4`. Usar 2.x, compatível com v3, sem efeito visual.
 
-### D-016 — Reanálise de avaliação já curada *(Proposta)*
+### D-016 — Reanálise pelo dono ou supervisor, com histórico *(Aceita em 2026-10-23)*
+**Decisão:** quem pode reanalisar continua como no original (dono da avaliação ou supervisor), inclusive após a curadoria, mas **nada é apagado**: cada reanálise cria nova `analysis_run`; execuções anteriores, decisões e `curation_logs` permanecem consultáveis como histórico; a UI pede confirmação quando já houver validação/curadoria.
+
+Contexto original:
 No original, "Reanalisar" aparece também em `curado`, apaga oportunidades curadas e reabre o ciclo sem aviso (README-DEV C.7, H.4). Proposta: reanálise de avaliação curada só por supervisor, com confirmação explícita; cria nova `analysis_run` e mantém a anterior e seus logs consultáveis como histórico.
