@@ -2,7 +2,7 @@
 
 Plataforma de análise e gestão da qualidade de atendimentos (Customer Experience e Customer Success), reconstruída de forma independente a partir da aplicação original desenvolvida no Base44.
 
-> **Estado atual:** Fase 0 (reconhecimento e planejamento) concluída. Ainda não existe código de aplicação. A primeira ordem de implementação é a [TASK-001](docs/tasks/TASK-001.md).
+> **Estado atual:** fundação local do frontend implementada pela [TASK-001](docs/tasks/TASK-001.md), com rotas provisórias. Autenticação, banco de dados e IA ainda não foram implementados.
 
 ## Objetivo
 
@@ -39,4 +39,25 @@ Reconstruir a aplicação existente com meta de **99% de paridade funcional e vi
 
 ## Execução local
 
-Será documentada pela TASK-001 (scripts `dev`, `build`, `lint`, `test`).
+Pré-requisitos: Node 22 atualizado (22.22.2 ou superior nesta linha, conforme as dependências) e npm. O arquivo `.nvmrc` seleciona a linha 22.
+
+```sh
+npm ci
+cp .env.example .env.local
+npm run dev
+```
+
+No PowerShell, use `Copy-Item .env.example .env.local` para copiar o arquivo. O servidor local abre em [http://localhost:5173](http://localhost:5173).
+
+A configuração é opcional nesta fase: sem variáveis, as páginas continuam funcionando e um aviso aparece somente em desenvolvimento. Os valores de `.env.example` são placeholders. Para preparar o cliente, informe somente a URL e a chave pública `sb_publishable_...` do Supabase em `.env.local`; `VITE_SUPABASE_ANON_KEY` é aceita como alternativa legada. Nunca use chaves secretas ou `service_role`. Não versione `.env.local`.
+
+| Comando | Finalidade |
+|---|---|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Build de produção em `dist/` |
+| `npm run preview` | Prévia local do build (porta 4173) |
+| `npm run lint` | ESLint, sem erros nem warnings |
+| `npm run test` | Testes em execução única |
+| `npm run test:watch` | Testes em modo de observação |
+
+Todas as rotas exibem páginas provisórias. Ainda não há autenticação, banco de dados, migrações SQL ou chamadas ao Supabase remoto. O cliente preparado não recupera nem renova sessões automaticamente; a configuração de autenticação pertence à TASK-014.
