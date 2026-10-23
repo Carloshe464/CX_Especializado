@@ -123,7 +123,7 @@ Funções análogas: `extract-transcript` (prints, visão multimodal, prompt REF
 
 ## 7. Storage
 
-Bucket privado `evaluation-files`, caminho `{analyst_user_id}/{evaluation_id}/{uuid}.{ext}`. Políticas de Storage espelham a RLS da avaliação. Exibição por URL assinada (TTL 3600 s, REF §10). Uploads registrados em `evaluation_files`; rotina de limpeza de órfãos (correção #9).
+Bucket privado `evaluation-files`, caminho `{organization_id}/{evaluation_id}/{uuid}.{ext}` (D-025). Políticas de Storage espelham a RLS da avaliação. Exibição por URL assinada (TTL 3600 s, REF §10). Uploads registrados em `evaluation_files`; rotina de limpeza de órfãos (correção #9).
 
 ## 8. Pesquisa pública
 

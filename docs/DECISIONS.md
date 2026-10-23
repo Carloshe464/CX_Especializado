@@ -29,6 +29,7 @@ Toda correção de comportamento da aplicação original deve aparecer aqui, cit
 | D-022 | Risco aceito: ESLint 9 (EOL) até o `eslint-plugin-react` suportar a v10 | Aceita (2026-10-23) |
 | D-023 | Organizações criadas pelo admin da plataforma no lançamento; autoatendimento exige o domínio do próprio e-mail verificado | Aceita (2026-10-23) |
 | D-024 | Validação do analista é o veredito padrão; decisão de curadoria do supervisor sobrepõe quando existir | Aceita (2026-10-23) |
+| D-025 | Caminho no Storage começa pela organização: `{org}/{avaliação}/{uuid}.{ext}` | Aceita (2026-10-23, orquestrador) |
 
 ---
 
@@ -212,3 +213,7 @@ Texto da proposta:
   - senão, vale o feedback do analista: `gostei` e `útil` = positivo (interpretação pendente da VALIDACAO §4.1);
   - senão, "sem validação".
 - A view `effective_feedback` e as RPCs entram na TASK-012.
+
+### D-025 — Caminho dos arquivos no Storage *(Aceita em 2026-10-23, decisão técnica do orquestrador)*
+**Contexto:** a ARCHITECTURE §7 previa `{analyst_user_id}/{evaluation_id}/...`, desenhada antes da multiempresa (D-002). O analista da avaliação pode mudar (D-013), o que deixaria o caminho inconsistente.
+**Decisão:** `{organization_id}/{evaluation_id}/{uuid}.{ext}`. A política exige que a organização do caminho seja a da avaliação, reforçando o isolamento (SEC-18), e o acesso segue a avaliação, não quem enviou o arquivo.
