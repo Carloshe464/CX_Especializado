@@ -1,0 +1,23 @@
+name: CI
+
+# Execução automática desativada por D-021 (economia de minutos do GitHub Actions).
+# Somente disparo manual, com autorização do responsável. Validação padrão: comandos locais.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
