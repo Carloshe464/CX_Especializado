@@ -5,7 +5,7 @@ Meta: **99% de paridade verificável**. Um item só conta como atingido com stat
 Status: ⬜ Não iniciado · 🟨 Em andamento · 🟦 Implementado (sem evidência) · ✅ Verificado · ⛔ Bloqueado
 REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 
-**Paridade atual comprovada: 0 / 96 itens (0%).**
+**Paridade atual comprovada: 0 / 102 itens (0%).**
 
 ## Fundação e visual
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
@@ -77,7 +77,7 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
 |---|---|---|---|---|---|---|
 | P-01 | Dashboard: badge curadoria pendente | §7.1 | Funcional | Paridade | teste | ⬜ |
-| P-02 | Dashboard: 4 StatCards (CSAT+, média, total, taxa de resposta) | §7.1 | Funcional | Paridade; definição de "taxa de resposta" a confirmar | teste com dataset | ⬜ |
+| P-02 | Dashboard: 4 StatCards (CSAT+, média, total, taxa de resposta) | §7.1 | Funcional | Paridade; fórmulas README-DEV Bloco F (taxa de resposta = avaliações com ≥1 CSAT / avaliações) | teste com dataset | ⬜ |
 | P-03 | Dashboard: CsatDistribution + SeverityChart + contadores de curadoria | §7.1 | Funcional | Paridade | teste | ⬜ |
 | P-04 | Dashboard: CompetencyEvolution (6 meses, `AAAA-MM`) | §7.1 | Funcional | Paridade | teste | ⬜ |
 | P-05 | Dashboard: AnalystComparison | §7.1 | Funcional | Paridade | teste | ⬜ |
@@ -126,3 +126,9 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | P-48 | Pipeline CI (lint, test, build) | — | Técnico | — | CI verde | ⬜ |
 | P-49 | Documentação de execução local | — | Técnico | — | README | ⬜ |
 | P-50 | Auditoria de custos (planos gratuitos) | — | Infra | — | relatório Fase 6 | ⬜ |
+| P-51 | Defaults de oportunidade (Desejável / Indeterminada / Médio / pendente) | README-DEV C.3 | Funcional | Paridade | teste | ⬜ |
+| P-52 | Classificação calculada pelo sistema, não confiada ao LLM | README-DEV C.3 | Funcional | Paridade | teste | ⬜ |
+| P-53 | CSAT: todos os registros nas médias; badge da lista usa o mais recente | README-DEV B.4, F | Funcional | Paridade | teste | ⬜ |
+| P-54 | Mensagens literais (bloqueio em curadoria, zero oportunidades, pesquisa inválida, obrigado) | README-DEV E.3 | Visual | Paridade | snapshot de texto | ⬜ |
+| P-55 | Charts: cores, alturas e formas (Bar h-64, Line h-72 domain 0–10, donut 55/85) | README-DEV E.3 | Visual | Paridade | snapshot | ⬜ |
+| P-56 | Reimportação não duplica CSAT | README-DEV D.10 | Integridade | Corrigido D-007 | teste | ⬜ |

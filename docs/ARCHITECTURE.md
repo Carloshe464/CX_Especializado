@@ -1,6 +1,6 @@
 # Arquitetura — Protocolo CX 1.1
 
-> Status: **proposta (Fase 0)**. Itens marcados *[pendente]* dependem de decisão do responsável ou do README-DEV de auditoria, ainda não disponível.
+> Status: **proposta (Fase 0)**. Itens marcados *[pendente]* dependem de decisão do responsável. **README-DEV** = `docs/reference/README-DEV_AUDITORIA_TECNICA.md`.
 > Referência de comportamento original: `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md` (citado como **REF §n**).
 
 ## 1. Visão geral
@@ -122,7 +122,7 @@ Bucket privado `evaluation-files`, caminho `{analyst_user_id}/{evaluation_id}/{u
 
 ## 9. Indicadores
 
-Agregações do Dashboard, Meu desenvolvimento e Satisfação feitas por **views/RPCs SQL** (sem limites fixos de 500/1000 da REF — correção #4), com testes comparando com cálculo de referência em JS sobre o mesmo conjunto sintético.
+Fórmulas exatas: README-DEV Bloco F (CSAT positivo, média, taxa de resposta, distribuição, evolução 6 meses, gravidade, comparativo por analista como média das médias, relação competência×satisfação, contadores de curadoria). Agregações do Dashboard, Meu desenvolvimento e Satisfação feitas por **views/RPCs SQL** (sem limites fixos de 500/1000 da REF — correção #4), com testes comparando com cálculo de referência em JS sobre o mesmo conjunto sintético.
 
 ## 10. Ambientes e CI
 

@@ -11,7 +11,7 @@ Se a mensagem inicial da sessão não deixar claro o papel, pergunte ao respons�
 
 1. Regras invioláveis do produto — `docs/reference/BRIEFING_ORQUESTRACAO_CX_1.1.md` §4 e `docs/SECURITY.md`.
 2. Decisões registradas — `docs/DECISIONS.md` (uma decisão aceita prevalece sobre o comportamento original quando o corrige).
-3. Comportamento original — `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md` (e o README-DEV de auditoria, quando disponível).
+3. Comportamento original — `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md` e `docs/reference/README-DEV_AUDITORIA_TECNICA.md` (auditoria do código real — prevalece sobre o primeiro quando divergirem em fatos de implementação).
 4. Ordem de trabalho da tarefa — `docs/tasks/TASK-NNN.md`.
 
 Conflito não resolvido por essa ordem → registrar em `docs/DECISIONS.md` como *Proposta* e pedir decisão ao responsável.

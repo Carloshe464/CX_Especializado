@@ -5,7 +5,7 @@ Cada fase só começa quando os critérios de saída da fase anterior estiverem 
 ## Fase 0 — Reconhecimento e planejamento ✅ (orquestrador)
 Entregas: governança (`CLAUDE.md`, `AGENTS.md`), arquitetura, decisões, segurança, matriz de paridade, TASK-001.
 Saída: documentos versionados; TASK-001 pronta para encaminhamento.
-Pendências que **não bloqueiam a Fase 1**: README-DEV de auditoria ausente; Supabase MCP indisponível nesta sessão; decisões D-002, D-008, D-009, D-011, D-012, D-013.
+Pendências que **não bloqueiam a Fase 1**: Supabase MCP indisponível nesta sessão; decisões D-002, D-008, D-009, D-011, D-012, D-013.
 
 ## Fase 1 — Fundação técnica
 | Tarefa | Escopo | Depende de |
