@@ -27,8 +27,8 @@ Toda correção de comportamento da aplicação original deve aparecer aqui, cit
 | D-020 | Risco aceito: alertas moderados do Tailwind 3 (build) | Aceita (2026-10-23) |
 | D-021 | GitHub Actions sem execução automática | Aceita (2026-10-23) |
 | D-022 | Risco aceito: ESLint 9 (EOL) até o `eslint-plugin-react` suportar a v10 | Aceita (2026-10-23) |
-| D-023 | Domínio da empresa = domínio do e-mail verificado do criador (sem prova DNS por ora) | Proposta (padrão adotado na TASK-010) |
-| D-024 | Veredito do supervisor = decisão de curadoria; feedback gostei/útil em `analysis_feedback` | Proposta (adotada na TASK-011) |
+| D-023 | Organizações criadas pelo admin da plataforma no lançamento; autoatendimento exige o domínio do próprio e-mail verificado | Aceita (2026-10-23) |
+| D-024 | Validação do analista é o veredito padrão; decisão de curadoria do supervisor sobrepõe quando existir | Aceita (2026-10-23) |
 
 ---
 
@@ -181,12 +181,26 @@ Especificação e perguntas: `docs/specs/EXTENSAO_CAPTURA.md`. É um produto sep
 **Decisão:** manter `eslint` e `@eslint/js` em 9.39.5. O ESLint só roda no desenvolvimento e não vai para o bundle. O aviso `deprecated` do `npm ci` é esperado.
 **Reavaliação:** quando o `eslint-plugin-react` publicar uma versão estável com peer `^10`, abrir uma tarefa de manutenção para migrar.
 
-### D-023 — Posse do domínio da empresa *(Proposta; padrão adotado na TASK-010)*
+### D-023 — Posse do domínio da empresa *(Aceita em 2026-10-23)*
+**Resposta do responsável:** "sem problemas, eu quem vou criar as organizações no momento de divulgar". Assim:
+- o admin da plataforma cria as organizações e cadastra o domínio de cada uma;
+- o primeiro supervisor entra pelo domínio e é promovido pelo admin;
+- o autoatendimento continua existindo, mas só com o domínio do próprio e-mail verificado;
+- a prova por DNS fica para o futuro.
+
+Texto da proposta:
 **Contexto:** a D-017 deixou em aberto se a posse do domínio precisa ser comprovada (ex.: registro DNS).
 **Proposta:** por ora, o domínio só pode ser registrado se for **exatamente** o domínio do e-mail **verificado** de quem cria a empresa. Domínios públicos são bloqueados e cada domínio pertence a uma única organização. A verificação por DNS fica como evolução futura: basta acrescentar `verified_at`/`verification_token` em `organization_domains`, sem quebrar o modelo.
 **Risco residual:** qualquer pessoa com e-mail verificado do domínio pode criar a empresa antes do dono legítimo. Mitigação: o admin da plataforma pode transferir ou remover o domínio.
 
-### D-024 — Como o veredito do supervisor é gravado *(Proposta; adotada na TASK-011)*
+### D-024 — Como o veredito do supervisor é gravado *(Aceita em 2026-10-23)*
+**Resposta do responsável:** "deve ser usada a opinião do analista, pois nem sempre o supervisor vai revisar a curadoria; o ideal é ele ter esse poder, mas ser considerado o do analista". Assim:
+- a **validação do analista é o veredito padrão** em Meu desenvolvimento, nos indicadores e na taxa de utilidade;
+- a decisão do supervisor só sobrepõe quando ele de fato revisar;
+- a falta de revisão do supervisor **nunca** bloqueia nem rebaixa o que o analista validou;
+- o caso "sem validação" só existe quando nenhum dos dois respondeu.
+
+Texto da proposta:
 **Contexto:** a D-011 pede veredito do supervisor prevalecendo sobre a validação do analista, e o original já tem curadoria aprovar/ajustar/rejeitar.
 **Proposta:**
 - O veredito do supervisor **é a decisão de curadoria**, com paridade de interface e de `curation_logs`:

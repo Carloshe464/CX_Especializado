@@ -8,7 +8,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 | TASK-000 | Fase 0 — reconhecimento, governança e planejamento | 0 | Claude Code (orquestrador) | — | `claude/youthful-mendel-aq8uze` | ✅ (em `main`) |
 | TASK-001 | Fundação React/Vite/Supabase | 1 | Operador (Codex ou Claude) | TASK-000 em `main` | `task/001-fundacao` · PR #2 | ✅ mesclada em 2026-10-23 |
 | TASK-002 | Biblioteca de domínio `lib/cx.js` + testes | 1 | Operador | TASK-001 · paralela à 004 | `task/002-dominio-cx` | ✅ mesclada (PR #4) |
-| TASK-003 | Layout `CxLayout` + componentes base | 1 | Operador | **TASK-004 mesclada** | `task/003-layout` | 📝 liberada |
+| TASK-003 | Layout `CxLayout` + componentes base | 1 | Operador | **TASK-004 mesclada** | `task/003-layout` | ✅ mesclada (PR #8) |
 | TASK-004 | Manutenção da toolchain (ESLint suportado, `engines`; actions só ao reativar CI) | 1 | Operador | TASK-001 · paralela à 002 | `task/004-toolchain` | ✅ mesclada parcial (PR #5, D-022) |
 | TASK-010 | Banco local: identidade, organizações, papéis, entrada por domínio | 2 | Operador | TASK-001 · **paralela à 003** | `task/010-identidade` | 📝 |
 | TASK-011 | Banco local: entidades de negócio + integridade + seed | 2 | Operador | **TASK-010 mesclada** | `task/011-entidades` | 📝 (2ª onda) |
@@ -30,7 +30,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 1. ~~Criar `main` e defini-la como padrão~~ — feito.
 2. ~~README-DEV~~ — incorporado em `docs/reference/README-DEV_AUDITORIA_TECNICA.md`.
 3. **Supabase MCP** não está conectado nesta sessão; verificação somente leitura do projeto pendente.
-4. Decisões de produto fechadas em 2026-10-23 (ver `docs/DECISIONS.md` e `docs/specs/`). Pendências menores: confirmar "retorno positivo" = gostei **e** útil; comprovação de posse de domínio (padrão proposto na D-023); padrão de URL do ClickDesk e qual número é o protocolo (DOM recebido, ver `specs/EXTENSAO_CAPTURA.md` §7); confirmar D-024; primeiro adaptador de provedor de IA (pode ficar para a Fase 3).
+4. Decisões de produto fechadas em 2026-10-23 (ver `docs/DECISIONS.md` e `docs/specs/`). Pendências menores: confirmar "retorno positivo" = gostei **e** útil; primeiro adaptador de provedor de IA (pode ficar para a Fase 3).
 5. Acesso à aplicação original no Base44 (somente leitura) para capturas de tela de referência (P-39).
 
 ## Registro de revisões
@@ -39,4 +39,5 @@ Status só muda com evidência (PR, CI, relatório do operador).
 | TASK-001 | #2 | `21f7f8f` | ✅ Aprovada; 5 pontos não bloqueantes → TASK-004/TASK-003/D-020 | CI run 39986235495 (lint 0 warnings, 73 testes, build); revisão do diff completo |
 | TASK-001 | #2 | `fe7427a` | Commit do orquestrador: CI só manual (D-021), sem efeito no código da aplicação | diff de 1 arquivo (`ci.yml`) |
 | TASK-004 | #5 | `498a86e` | ✅ Aprovada como parcial: `engines.node >=22.22.2`; ESLint 10 bloqueado pelo peer de `eslint-plugin-react` (D-022) | saídas locais no PR (lint 0, 73 testes, build, anti-`require`, audit antes/depois); diff 2+/2− |
+| TASK-003 | #8 | `87b12ff` | ✅ Aprovada; sessão separada em `auth/session.js` e `navigation.js` (react-refresh), desvio aceito | saídas locais (lint 0, 227 testes, build), capturas 1280/375, revisão do diff |
 | TASK-002 | #4 | `18606ad` | ✅ Aprovada; branch `claude/magical-hamilton-06itj1` (desvio aceito); `STATUS_STYLES.rascunho` derivado | saídas locais no PR (lint 0, 205 testes, build); revisão do diff completo |
