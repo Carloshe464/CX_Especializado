@@ -93,3 +93,16 @@ it('provider padrão e hook sem provider usam user/role nulos e callback inerte'
   render(<SessionProbe />)
   expect(screen.getByRole('button')).toHaveTextContent('{"user":null,"role":null}')
 })
+
+function StatusProbe() {
+  const { status, needsOnboarding } = useSession()
+  return <p>{`${status}:${needsOnboarding}`}</p>
+}
+
+it('SessionProvider sintético (só para testes) deriva o status da presença de usuário', () => {
+  const first = render(<SessionProvider><StatusProbe /></SessionProvider>)
+  expect(screen.getByText('signed_out:false')).toBeInTheDocument()
+  first.unmount()
+  render(<SessionProvider value={{ user: { email: 'a@exemplo.test' }, role: 'analista' }}><StatusProbe /></SessionProvider>)
+  expect(screen.getByText('signed_in:false')).toBeInTheDocument()
+})

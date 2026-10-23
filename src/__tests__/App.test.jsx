@@ -7,28 +7,29 @@ vi.mock('@/lib/supabaseClient', () => ({
   supabase: null,
 }))
 
-afterEach(() => vi.unstubAllEnvs())
+afterEach(() => {
+  vi.unstubAllEnvs()
+  window.history.replaceState(null, '', '/')
+})
 
-it('continua funcionando sem configuração e informa o desenvolvedor', () => {
+it('sem configuração leva ao login e informa o desenvolvedor', () => {
   vi.stubEnv('DEV', true)
   render(<App />)
-  expect(screen.getByRole('heading', { name: 'Painel' })).toBeInTheDocument()
-  expect(screen.getByRole('status')).toHaveTextContent('Configure VITE_SUPABASE_URL')
+  expect(screen.getByRole('heading', { level: 1, name: 'Entrar' })).toBeInTheDocument()
+  expect(window.location.pathname).toBe('/login')
+  expect(screen.getByText(/Configure VITE_SUPABASE_URL/, { selector: 'div[role="status"]' })).toBeInTheDocument()
 })
 
 it('não exibe o aviso de configuração em produção', () => {
   vi.stubEnv('DEV', false)
   render(<App />)
-  expect(screen.getByRole('heading', { name: 'Painel' })).toBeInTheDocument()
-  expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  expect(screen.getByRole('heading', { level: 1, name: 'Entrar' })).toBeInTheDocument()
+  expect(screen.queryByText(/Configure VITE_SUPABASE_URL/)).not.toBeInTheDocument()
 })
 
-it('sem provider de teste usa sessão nula e não inventa usuário ou papel', () => {
+it('sem configuração não inventa usuário nem papel', () => {
   render(<App />)
-  expect(screen.getByText('Sessão não iniciada')).toBeInTheDocument()
+  expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
   expect(screen.queryByRole('button', { name: 'Sair' })).not.toBeInTheDocument()
-  expect(screen.queryByText(/SUPERVISOR|ANALISTA|ADMIN GERAL|@/)).not.toBeInTheDocument()
-  expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual([
-    'Avaliações', 'Nova avaliação', 'Avaliações', 'Nova avaliação',
-  ])
+  expect(screen.queryByText(/SUPERVISOR|ANALISTA|ADMIN GERAL/)).not.toBeInTheDocument()
 })
