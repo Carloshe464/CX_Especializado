@@ -13,7 +13,9 @@ Status só muda com evidência (PR, CI, relatório do operador).
 | TASK-010 | Banco local: identidade, organizações, papéis, entrada por domínio | 2 | Operador | TASK-001 · **paralela à 003** | PR #11 | ✅ mesclada |
 | TASK-011 | Banco local: entidades de negócio + integridade + seed | 2 | Operador | **TASK-010 mesclada** | `task/011-entidades` | 📝 liberada |
 | TASK-014 | Auth no frontend: e-mail/senha + Google, ProtectedRoute, redirecionamentos por papel, onboarding | 2 | Operador | TASK-003 ✅ + **TASK-010 mesclada** · paralela à 011 | `task/014-auth` | 📝 liberada (paralela à 011) |
-| TASK-012, 013, 015 | RLS de negócio + RPCs, Storage, revisão de segurança | 2 | Operador / orquestrador | TASK-011 | — | 💤 |
+| TASK-012 | Banco local: RLS de negócio, RPCs de validação/curadoria, `effective_feedback` | 2 | Operador | **TASK-011 mesclada** · paralela à 014 | `task/012-rls-negocio` | 📝 (aguarda 011) |
+| TASK-013 | Storage privado + `evaluation_files` + serviço de upload/URL assinada | 2 | Operador | **TASK-012 mesclada** | `task/013-storage` | 📝 (aguarda 012) |
+| TASK-015 | Revisão de segurança da Fase 2 + pedido de autorização para o remoto | 2 | Orquestrador | 011–014 mescladas | — | 💤 |
 | TASK-020…025 | Motor de IA + configuração de provedor | 3 | Operador | Fase 2 + escolha do primeiro adaptador de provedor | — | 💤 |
 | TASK-040…044 | Extensão de captura | E | Operador | Fase 4 + exemplo de URL/DOM do ClickDesk | — | 💤 |
 
@@ -24,7 +26,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 ## Ordem de execução da Fase 2
 1. **Agora (paralelo):** TASK-003 (frontend) e TASK-010 (banco). Arquivos disjuntos: `src/`+`package.json` × `supabase/`.
 2. **Depois da TASK-010 mesclada:** TASK-011.
-3. **Depois da TASK-011:** TASK-012 (RLS/RPCs) e TASK-013 (Storage); TASK-014 (Auth no frontend) depois da TASK-003 e da TASK-010.
+3. **Depois da TASK-011:** TASK-012 (RLS/RPCs); **depois da TASK-012:** TASK-013 (Storage). A TASK-014 (Auth no frontend) já está liberada.
 4. **TASK-015:** revisão de segurança pelo orquestrador + pedido de autorização para aplicar no remoto.
 
 ## Backlog identificado em revisões
