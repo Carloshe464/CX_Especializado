@@ -125,7 +125,7 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | P-45 | Edge Functions validam papel | — | Segurança | SEC-12 | teste | ⬜ |
 | P-46 | Logs de falha sem PII | — | Segurança | SEC-14 | teste | ⬜ |
 | P-47 | Varredura de segredos no CI | — | Segurança | SEC-01 | CI | ⬜ |
-| P-48 | Pipeline CI (lint, test, build) | — | Técnico | — | CI run 39986235495 | ✅ |
+| P-48 | Pipeline CI (lint, test, build) | — | Técnico | — | CI run 39986235495 (workflow manual desde D-021) | ✅ |
 | P-49 | Documentação de execução local | — | Técnico | — | README (PR #2) | ✅ |
 | P-50 | Auditoria de custos (planos gratuitos) | — | Infra | — | relatório Fase 6 | ⬜ |
 | P-51 | Defaults de oportunidade (Desejável / Indeterminada / Médio / pendente) | README-DEV C.3 | Funcional | Paridade | teste | ⬜ |
