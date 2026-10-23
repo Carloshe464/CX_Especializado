@@ -7,7 +7,7 @@ Itens **Alterado** seguem a nova regra decidida pelo responsável (não a REF) e
 Status: ⬜ Não iniciado · 🟨 Em andamento · 🟦 Implementado (sem evidência) · ✅ Verificado · ⛔ Bloqueado
 REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 
-**Paridade atual comprovada: 7 / 102 itens (6,9%)** — após aprovação da TASK-001 (vale quando o PR #2 for mesclado).
+**Paridade atual comprovada: 7 / 102 itens (6,9%)** — TASK-001 mesclada (PR #2).
 
 ## Fundação e visual
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |

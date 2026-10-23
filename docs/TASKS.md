@@ -6,13 +6,17 @@ Status só muda com evidência (PR, CI, relatório do operador).
 | ID | Título | Fase | Responsável | Depende de | Branch / PR | Status |
 |---|---|---|---|---|---|---|
 | TASK-000 | Fase 0 — reconhecimento, governança e planejamento | 0 | Claude Code (orquestrador) | — | `claude/youthful-mendel-aq8uze` | ✅ (em `main`) |
-| TASK-001 | Fundação React/Vite/Supabase | 1 | Operador (Codex ou Claude) | TASK-000 em `main` | `task/001-fundacao` · PR #2 | ✅ aprovada em 2026-10-23 (aguarda merge) |
-| TASK-002 | Biblioteca de domínio `lib/cx.js` + testes | 1 | Operador | TASK-001 | — | 💤 |
-| TASK-003 | Layout `CxLayout` + componentes base | 1 | Operador | TASK-001 | — | 💤 |
-| TASK-004 | Manutenção da toolchain (ESLint suportado, `engines`; actions só ao reativar CI) | 1 | Operador | TASK-001 | — | 💤 |
+| TASK-001 | Fundação React/Vite/Supabase | 1 | Operador (Codex ou Claude) | TASK-000 em `main` | `task/001-fundacao` · PR #2 | ✅ mesclada em 2026-10-23 |
+| TASK-002 | Biblioteca de domínio `lib/cx.js` + testes | 1 | Operador | TASK-001 · paralela à 004 | `task/002-dominio-cx` | 📝 |
+| TASK-003 | Layout `CxLayout` + componentes base | 1 | Operador | **TASK-004 mesclada** | `task/003-layout` | 📝 (2ª onda) |
+| TASK-004 | Manutenção da toolchain (ESLint suportado, `engines`; actions só ao reativar CI) | 1 | Operador | TASK-001 · paralela à 002 | `task/004-toolchain` | 📝 |
 | TASK-010…015 | Organizações, banco, RLS, Storage, Auth | 2 | Operador | Fase 1 + Supabase CLI para o operador | — | 💤 (decisões tomadas) |
 | TASK-020…025 | Motor de IA + configuração de provedor | 3 | Operador | Fase 2 + escolha do primeiro adaptador de provedor | — | 💤 |
 | TASK-040…044 | Extensão de captura | E | Operador | Fase 4 + exemplo de URL/DOM do ClickDesk | — | 💤 |
+
+## Ordem de execução da Fase 1
+1. **Onda 1 (paralelo):** TASK-002 e TASK-004. Arquivos distintos; quem for mesclado por último traz a `main` e repete as validações.
+2. **Onda 2:** TASK-003, depois da TASK-004 mesclada (conflito de `package.json`/lockfile e regras de lint).
 
 ## Bloqueios e pendências do responsável
 1. ~~Criar `main` e defini-la como padrão~~ — feito.
