@@ -138,7 +138,7 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 ## Funcionalidades novas (fora da paridade — não entram no percentual)
 | ID | Funcionalidade | Decisão | Especificação | Status |
 |---|---|---|---|---|
-| N-01 | Organizações, vínculos e admin da plataforma | D-002, D-017 | ARCHITECTURE §3 | ⬜ |
+| N-01 | Organizações, vínculos e admin da plataforma | D-002, D-017 | ARCHITECTURE §3 | 🟨 banco local pronto (PR #11, 102 testes pgTAP); interface na TASK-014 |
 | N-02 | Login Google + cadastro aberto | D-008 | ARCHITECTURE §3 | ⬜ |
 | N-03 | Validação do analista (gostei/útil/comentário) em diagnóstico e oportunidades | D-011 | specs/VALIDACAO_E_CURADORIA | ⬜ |
 | N-04 | Veredito do supervisor com prioridade | D-011 | specs/VALIDACAO_E_CURADORIA | ⬜ |
