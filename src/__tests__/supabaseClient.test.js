@@ -18,7 +18,7 @@ it('não cria cliente nem faz rede sem configuração', async () => {
   expect(fetch).not.toHaveBeenCalled()
 })
 
-it('cria um único cliente configurado sem rede nem recuperação automática de sessão', async () => {
+it('cria um único cliente com sessão persistente, renovação automática e fluxo PKCE', async () => {
   vi.stubEnv('VITE_SUPABASE_URL', 'https://exemplo.supabase.co')
   vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY', 'sb_publishable_ficticia')
   const fetch = vi.fn()
@@ -29,8 +29,11 @@ it('cria um único cliente configurado sem rede nem recuperação automática de
   expect(first.supabase).toBeTruthy()
   expect(first.supabase).toBe(second.supabase)
   expect(first.supabaseConfigError).toBeNull()
-  expect(first.supabase.auth.persistSession).toBe(false)
-  expect(first.supabase.auth.autoRefreshToken).toBe(false)
-  expect(first.supabase.auth.detectSessionInUrl).toBe(false)
+  expect(first.supabase.auth.persistSession).toBe(true)
+  expect(first.supabase.auth.autoRefreshToken).toBe(true)
+  expect(first.supabase.auth.detectSessionInUrl).toBe(true)
+  expect(first.supabase.auth.flowType).toBe('pkce')
+  // Sem sessão salva e sem código na URL, nada vai para a rede.
   expect(fetch).not.toHaveBeenCalled()
+  first.supabase.auth.stopAutoRefresh()
 })

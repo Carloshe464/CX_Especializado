@@ -2,7 +2,10 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { queryClient } from '@/lib/query-client'
 import { supabaseConfigError } from '@/lib/supabaseClient'
-import { SessionProvider } from '@/auth/SessionContext'
+import { AuthProvider } from '@/auth/AuthProvider'
+import ProtectedRoute from '@/auth/ProtectedRoute'
+import PublicOnlyRoute from '@/auth/PublicOnlyRoute'
+import RequireRole from '@/auth/RequireRole'
 import Layout from '@/components/cx/Layout'
 import ScrollToTop from '@/components/ScrollToTop'
 import { Toaster } from '@/components/ui/toaster'
@@ -10,6 +13,7 @@ import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 import ForgotPassword from '@/pages/ForgotPassword'
 import ResetPassword from '@/pages/ResetPassword'
+import Onboarding from '@/pages/Onboarding'
 import Survey from '@/pages/Survey'
 import Dashboard from '@/pages/Dashboard'
 import Evaluations from '@/pages/Evaluations'
@@ -21,35 +25,43 @@ import Satisfaction from '@/pages/Satisfaction'
 import ProtocolPage from '@/pages/ProtocolPage'
 import PageNotFound from '@/pages/PageNotFound'
 
+const MANAGERS = ['supervisor', 'platform_admin']
+
 export function AppRoutes() {
-  // TODO(TASK-014): envolver com ProtectedRoute as rotas dentro de Layout.
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route element={<PublicOnlyRoute />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+      </Route>
+      {/* Fica fora de PublicOnlyRoute: o link de recuperação cria uma sessão. */}
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/pesquisa/:token" element={<Survey />} />
-      <Route element={<Layout />}>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/avaliacoes" element={<Evaluations />} />
-        <Route path="/nova-avaliacao" element={<NewEvaluation />} />
-        <Route path="/avaliacao/:id" element={<EvaluationDetail />} />
-        <Route path="/curadoria" element={<Curation />} />
-        <Route path="/meu-desenvolvimento" element={<MyDevelopment />} />
-        <Route path="/satisfacao" element={<Satisfaction />} />
-        <Route path="/protocolo" element={<ProtocolPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/onboarding" element={<Onboarding />} />
+        <Route element={<Layout />}>
+          <Route path="/" element={<RequireRole deny={['analista']} redirectTo="/meu-desenvolvimento"><Dashboard /></RequireRole>} />
+          <Route path="/avaliacoes" element={<Evaluations />} />
+          <Route path="/nova-avaliacao" element={<NewEvaluation />} />
+          <Route path="/avaliacao/:id" element={<EvaluationDetail />} />
+          <Route path="/curadoria" element={<RequireRole allow={MANAGERS} redirectTo="/"><Curation /></RequireRole>} />
+          <Route path="/meu-desenvolvimento" element={<MyDevelopment />} />
+          <Route path="/satisfacao" element={<RequireRole allow={MANAGERS} redirectTo="/"><Satisfaction /></RequireRole>} />
+          <Route path="/protocolo" element={<ProtocolPage />} />
+        </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   )
 }
 
+// AuthProvider fica dentro do roteador para que "Sair" possa navegar para /login.
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        <BrowserRouter>
+      <BrowserRouter>
+        <AuthProvider>
           <ScrollToTop />
           {import.meta.env.DEV && supabaseConfigError && (
             <div role="status" className="bg-accent px-4 py-2 text-sm text-accent-foreground">
@@ -58,8 +70,8 @@ export default function App() {
           )}
           <AppRoutes />
           <Toaster />
-        </BrowserRouter>
-      </SessionProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   )
 }
