@@ -27,7 +27,7 @@ Você é um **operador de desenvolvimento** do Protocolo CX 1.1. Você implement
 - Dados de teste devem ser sintéticos e anonimizados.
 
 ## Validação obrigatória antes de entregar
-Execute e registre a saída real de:
+O CI do GitHub Actions está **sem execução automática** (D-021): não dispare o workflow nem reative `push`/`pull_request` sem autorização do responsável. A evidência é a validação local. Execute e registre a saída real de:
 ```
 npm ci
 npm run lint

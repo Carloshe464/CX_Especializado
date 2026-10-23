@@ -33,7 +33,7 @@ Conflito não resolvido por essa ordem → registrar em `docs/DECISIONS.md` como
 
 ### Checklist de revisão de PR
 1. O escopo corresponde exatamente à ordem de trabalho? Nada além dela.
-2. CI verde no commit atual (lint, test, build) — verificar os logs, não só o status.
+2. Validação no commit atual (lint, test, build): pelas saídas locais coladas no relatório do operador, enquanto vigorar a D-021 (Actions sem execução automática); com CI reativado, verificar os logs, não só o status.
 3. Nenhum segredo, `.env`, chave `service_role` ou chave de IA no diff ou no bundle do frontend.
 4. Regras de segurança da `SECURITY.md` aplicáveis estão cobertas por testes (RLS testada com usuários distintos a partir da Fase 2).
 5. Textos de UI em pt-BR; tokens visuais conforme `docs/reference` §9.
