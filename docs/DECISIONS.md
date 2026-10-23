@@ -26,6 +26,7 @@ Toda correção de comportamento da aplicação original deve aparecer aqui, cit
 | D-019 | Protocolo V1.2: comunicação assertiva e rapport nas oportunidades | Aceita (texto aprovado) |
 | D-020 | Risco aceito: alertas moderados do Tailwind 3 (build) | Aceita (2026-10-23) |
 | D-021 | GitHub Actions sem execução automática | Aceita (2026-10-23) |
+| D-022 | Risco aceito: ESLint 9 (EOL) até o `eslint-plugin-react` suportar a v10 | Aceita (2026-10-23) |
 
 ---
 
@@ -172,3 +173,8 @@ Especificação e perguntas: `docs/specs/EXTENSAO_CAPTURA.md`. É um produto sep
 **Decisão:** para economizar os minutos disponíveis, o workflow `.github/workflows/ci.yml` fica **somente com `workflow_dispatch`** (disparo manual). Nenhum agente dispara o workflow sem autorização do responsável.
 **Validação substituta:** o operador executa localmente `npm ci`, `npm run lint`, `npm run test` e `npm run build` e cola as saídas reais no relatório do PR. O orquestrador revisa o diff e as saídas.
 **Reativação:** `push`/`pull_request` voltam quando houver "algo concreto", por decisão do responsável (candidatos: fim da Fase 2, com testes de RLS, ou preparação da publicação).
+
+### D-022 — Risco aceito: ESLint 9 em fim de suporte *(Aceita em 2026-10-23, revisão da TASK-004)*
+**Contexto:** a política oficial (https://eslint.org/version-support) marca o ESLint 9 como EOL desde 2026-08-06. A versão estável atual do `eslint-plugin-react` (7.37.5) declara `peerDependencies.eslint` até `^9.7`, o que impede a v10 sem `--force` ou troca de plugin (vedados pela TASK-004).
+**Decisão:** manter `eslint` e `@eslint/js` em 9.39.5. O ESLint só roda no desenvolvimento e não vai para o bundle. O aviso `deprecated` do `npm ci` é esperado.
+**Reavaliação:** quando o `eslint-plugin-react` publicar uma versão estável com peer `^10`, abrir uma tarefa de manutenção para migrar.
