@@ -34,6 +34,8 @@
 
 Único: `(analysis_run_id, target_type, opportunity_id, author_role)`, com um veredito vigente por papel. A view `effective_feedback` calcula V4.
 
+> **Refinamento (D-024):** a coluna `adjusted_recommendation` fica em `opportunities`, não aqui. O veredito do supervisor é a decisão de curadoria (`opportunities.status`, `evaluations.diagnosis_status`). As linhas de supervisor em `analysis_feedback` são opcionais e servem só à taxa de utilidade.
+
 ## 3. Estados exibidos (proposta do orquestrador)
 Proposta: manter os rótulos originais. `analisado` = "Em curadoria", até o supervisor dar veredito no diagnóstico; aí vira `curado` = "Curadoria concluída". A validação do analista não muda o status. A fila de Curadoria prioriza avaliações cujo analista marcou algo como "não útil".
 
