@@ -12,15 +12,17 @@ Toda correção de comportamento da aplicação original deve aparecer aqui, cit
 | D-005 | npm como gerenciador de pacotes | Aceita |
 | D-006 | Vitest + Testing Library | Aceita |
 | D-007 | Correções dos 9 problemas conhecidos | Aceita (detalhes por fase) |
-| D-008 | Política de cadastro de usuários | **Proposta** |
-| D-009 | Provedor e modelo de IA | **Proposta** |
+| D-008 | Cadastro aberto com Google + e-mail | Aceita (2026-10-23) |
+| D-009 | IA plugável configurada pela interface | Aceita (provedor inicial em aberto) |
 | D-010 | Diagnóstico em `analysis_runs` versionadas | Aceita (fixar na Fase 2) |
-| D-011 | Modelo de curadoria e visibilidade do analista | **Em redefinição** pelo responsável |
+| D-011 | Validação dupla: analista + supervisor (prevalece) | Aceita (2026-10-23) |
 | D-012 | Protocolo único por organização | Aceita (2026-10-23) |
-| D-013 | Avaliação criada por supervisor sem analista vinculado | **Proposta** |
-| D-014 | Mecanismo de extração de planilhas | **Proposta** |
+| D-013 | Supervisor escolhe o analista ao criar | Aceita (2026-10-23) |
+| D-014 | Planilha: parser + IA só para mapear colunas | Aceita (2026-10-23) |
 | D-015 | `tailwind-merge` 2.x | Aceita |
 | D-016 | Reanálise pelo dono ou supervisor, com histórico | Aceita (2026-10-23) |
+| D-017 | Papéis: admin da plataforma, supervisor, analista | Aceita (detalhes em aberto) |
+| D-018 | Extensão de navegador para captura de atendimentos | Aceita (escopo); especificação em aberto |
 
 ---
 
@@ -75,16 +77,32 @@ Problemas adicionais (REF e README-DEV Bloco H), tratados nas mesmas fases:
 - **Update de `Evaluation` por `created_by_id`** permite ao analista gravar `diagnosis_status='aprovado'` → coberto por #2.
 - **`EvaluationScore`/`Opportunity` com update pelo dono** permite ao analista aprovar as próprias oportunidades → coberto por #2.
 
-### D-008 — Política de cadastro *(Proposta)*
+### D-008 — Cadastro aberto com Google + e-mail *(Aceita em 2026-10-23)*
+**Decisão:** cadastro aberto (self-service), com login Google (Supabase Auth OAuth) e e-mail/senha, além de recuperação de senha. O fluxo de entrada na organização está na D-017.
+
+Contexto original:
 REF §11.8 indica convite pela plataforma, mas existe `/register`. O README-DEV (§0.3, A.8, B.10) confirma no original: e-mail/senha, **Google OAuth**, registro com OTP, reset de senha, e entrada de usuários **por convite**. Proposta: manter a rota `/register` (paridade), todo cadastro nasce com `role='user'`, papel `admin` atribuído somente por supervisor existente; avaliar com o responsável se o signup público deve ser desativado em produção.
 
-### D-009 — Provedor e modelo de IA *(Proposta)*
+### D-009 — IA plugável configurada pela interface *(Aceita em 2026-10-23)*
+**Decisão:** o provedor ainda não foi escolhido e o modelo será o da API conectada. Uma tela de configuração permite informar provedor, endpoint, modelo e chave; o motor usa adaptadores (inicialmente: protocolo compatível com OpenAI, que cobre vários provedores e servidores locais, e adaptadores nativos conforme a escolha). Modelos locais ficam para bem depois. Especificação: `docs/specs/PROVEDOR_IA.md`.
+**Segurança:** a chave é gravada só no servidor (cifrada, Supabase Vault), nunca retorna ao navegador (campo somente escrita, exibe apenas os 4 últimos caracteres) e só a Edge Function a lê.
+
+Contexto original:
 O original usa `InvokeLLM` sem modelo ("automatic", escolha interna e não inspecionável — README-DEV C.10/H.6), então não há modelo a copiar: é preciso **fixar** um. O motor é independente de provedor (adaptador). Escolha do provedor/modelo inicial, orçamento e chave ficam com o responsável antes da Fase 3. Requisitos: saída JSON estruturada, visão multimodal (prints/PDF), execução a partir de Edge Function.
 
 ### D-010 — Diagnóstico em `analysis_runs`
 Separa o resultado de cada execução da IA da linha da avaliação: permite versionar prompt/modelo, preservar curadorias anteriores (#3) e proteger conteúdo pendente por RLS (#1). A UI continua exibindo os mesmos campos da REF §7.4.
 
-### D-011 — Modelo de curadoria e visibilidade do analista *(Em redefinição)*
+### D-011 — Validação dupla: analista + supervisor *(Aceita em 2026-10-23)*
+**Decisão do responsável (substitui a regra do briefing §4.6 e SEC-06 antigas):**
+1. O analista vê a análise da IA assim que ela termina.
+2. O analista valida **o diagnóstico e cada oportunidade**: gostei/não gostei, útil/não útil e comentário opcional.
+3. O supervisor vê tudo e também avalia. **A avaliação do supervisor prevalece** sobre a do analista.
+4. "Meu desenvolvimento" mostra só o que tem retorno positivo: aprovado pelo supervisor, ou marcado positivo pelo analista sem avaliação contrária do supervisor (*interpretação a confirmar*).
+5. Taxa de utilidade da IA entra nos indicadores; o analista vê apenas a taxa das próprias avaliações.
+Especificação: `docs/specs/VALIDACAO_E_CURADORIA.md`. Proteções que continuam valendo: o analista não altera a avaliação do supervisor nem a de outro analista, e o log de curadoria segue imutável.
+
+Histórico (redação anterior):
 **Resposta do responsável (2026-10-23):** "a aprovação do supervisor se dá a um analista validar a orientação da IA e confirmar se gostou e se foi útil. A questão do supervisor é conseguir visualizar tudo, mas o analista precisa conseguir criar uma avaliação de um chat dele", e haverá novas funções para o fluxo.
 **Impacto:** altera a regra do briefing §4.6 ("o analista não pode acessar resultados pendentes de aprovação") e SEC-06. Como é decisão do responsável sobre regra de produto, prevalece, mas o novo modelo precisa ser especificado antes da Fase 2 (quem valida o quê, o que o supervisor ainda decide, o que alimenta "Meu desenvolvimento" e os indicadores). Texto anterior mantido abaixo como histórico.
 
@@ -97,10 +115,13 @@ A REF §7.4 define `canSeeAnalysis = isAdmin || isOwner || diagnosis_status==='a
 Contexto original:
 A REF reutiliza a avaliação por protocolo na importação, mas não impõe unicidade. Proposta: índice único sobre `lower(trim(protocol))` quando não nulo; criação concorrente retorna a avaliação existente. O README-DEV (B.1) confirma que não há chave única e que a deduplicação é só aplicacional na importação (criação manual não deduplica). Confirmar se o mesmo chamado pode ter mais de uma avaliação legítima (ex.: atendimentos distintos com o mesmo protocolo).
 
-### D-013 — Avaliação criada por supervisor sem analista *(Proposta)*
+### D-013 — Supervisor escolhe o analista ao criar *(Aceita em 2026-10-23)*
+**Decisão:** ao criar uma avaliação, o supervisor seleciona um analista da própria organização. O nome livre fica só para importações sem correspondência, com vinculação posterior.
+
+Contexto original:
 REF §7.3: supervisor cria com `analyst_user_id = null` e nome livre, logo o analista nunca vê a avaliação no portal. Proposta: o supervisor seleciona o analista (perfil existente) ao criar; nome livre permanece apenas para importações sem correspondência, com vinculação posterior.
 
-### D-014 — Extração de planilhas *(Proposta)*
+### D-014 — Extração de planilhas *(Aceita em 2026-10-23: opção A)*
 O original usa `ExtractDataFromUploadedFile` da plataforma, tolerante a qualquer layout (README-DEV C.5, A.8). Opções: (A) parser determinístico (CSV/XLSX → linhas) + **mapeamento de colunas por IA** apenas sobre o cabeçalho e amostra, seguido de `normalizeSpreadsheetRow` idêntico ao original; (B) enviar a planilha inteira ao LLM como o original. Recomendação: A — mais barato, reprodutível e testável, preservando o mesmo resultado de linhas (skip/avaliação/CSAT).
 
 ### D-015 — `tailwind-merge` 2.x
@@ -111,3 +132,20 @@ O original declara `tailwind-merge ^3`, linha voltada ao Tailwind v4, com `tailw
 
 Contexto original:
 No original, "Reanalisar" aparece também em `curado`, apaga oportunidades curadas e reabre o ciclo sem aviso (README-DEV C.7, H.4). Proposta: reanálise de avaliação curada só por supervisor, com confirmação explícita; cria nova `analysis_run` e mantém a anterior e seus logs consultáveis como histórico.
+
+### D-017 — Papéis e entrada na organização *(Aceita; detalhes em aberto)*
+**Decisão do responsável:** três níveis.
+- **Admin da plataforma** (o responsável): papel global, único que pode pertencer a várias organizações e enxergá-las.
+- **Supervisor**, por organização: vê e avalia tudo da organização.
+- **Analista**, por organização: pertence a uma única organização.
+
+O cadastro é self-service. *Em aberto:* como um novo usuário entra na organização certa (criar organização ao se cadastrar e virar supervisor; convite por link; domínio de e-mail). O papel global fica numa tabela própria (`platform_admins`), gerenciada só pelo banco/painel, nunca pelo cliente.
+
+### D-018 — Extensão de captura de atendimentos *(Aceita no escopo; especificação em aberto)*
+**Decisão do responsável:** extensão de navegador, semelhante à Neeko, que:
+- anota a transcrição do atendimento;
+- salva em `.txt` numa pasta escolhida pelo analista, automaticamente ao fim do atendimento;
+- tem um botão explícito "Analisar ao vivo", que captura até a última mensagem e anexa ao mesmo `.txt`;
+- identifica o arquivo pelo número do atendimento/ticket extraído da URL, chave pela qual o sistema será alimentado.
+
+Especificação e perguntas: `docs/specs/EXTENSAO_CAPTURA.md`. É um produto separado (pasta `extension/`), planejado como trilha própria após a Fase 4.
