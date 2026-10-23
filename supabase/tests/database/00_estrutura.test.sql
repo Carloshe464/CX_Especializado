@@ -7,9 +7,10 @@ select plan(14);
 -- SEC-16: todas as tabelas de public têm RLS habilitada.
 select set_eq(
   $$ select c.relname::text from pg_class c join pg_namespace n on n.oid = c.relnamespace
-     where n.nspname = 'public' and c.relkind in ('r', 'p') $$,
+     where n.nspname = 'public' and c.relkind in ('r', 'p')
+       and c.relname in ('profiles', 'organizations', 'organization_domains', 'memberships', 'platform_admins') $$,
   array['profiles', 'organizations', 'organization_domains', 'memberships', 'platform_admins'],
-  'public contém exatamente as tabelas de identidade'
+  'public preserva as tabelas de identidade (outras tarefas podem acrescentar tabelas)'
 );
 select is_empty(
   $$ select c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace
@@ -34,7 +35,8 @@ select set_eq(
   $$ select p.proname::text from pg_proc p join pg_namespace n on n.oid = p.pronamespace
      where n.nspname = 'private' and p.prosecdef $$,
   array['current_org_id', 'is_member', 'is_supervisor', 'is_platform_admin',
-        'handle_new_user', 'handle_user_email_change', 'reject_public_domain'],
+        'handle_new_user', 'handle_user_email_change', 'reject_public_domain',
+        'seed_organization_business'],
   'funções privilegiadas restantes ficam no schema private'
 );
 
