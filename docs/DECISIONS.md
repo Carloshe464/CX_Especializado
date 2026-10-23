@@ -23,7 +23,8 @@ Toda correção de comportamento da aplicação original deve aparecer aqui, cit
 | D-016 | Reanálise pelo dono ou supervisor, com histórico | Aceita (2026-10-23) |
 | D-017 | Papéis: admin da plataforma, supervisor, analista | Aceita (detalhes em aberto) |
 | D-018 | Extensão de navegador para captura de atendimentos | Aceita (escopo); especificação em aberto |
-| D-019 | Protocolo V1.2: comunicação assertiva e rapport nas oportunidades | Aceita (requisito); texto do prompt em aprovação |
+| D-019 | Protocolo V1.2: comunicação assertiva e rapport nas oportunidades | Aceita (texto aprovado) |
+| D-020 | Risco aceito: alertas moderados do Tailwind 3 (build) | Aceita (2026-10-23) |
 
 ---
 
@@ -161,3 +162,7 @@ Especificação e perguntas: `docs/specs/EXTENSAO_CAPTURA.md`. É um produto sep
 ### D-019 — Protocolo V1.2: comunicação assertiva e rapport nas oportunidades *(Aceita como requisito em 2026-10-23)*
 **Decisão do responsável:** o bloco de oportunidades de melhoria deve usar comunicação clara e efetiva, com técnicas de comunicação assertiva e de rapport.
 **Implementação:** nova versão do prompt (V1.2), que acrescenta uma seção à V1.1 sem remover regras. A V1.1 continua verbatim como linha de base de paridade. Novo campo `communication_techniques` por oportunidade. Texto proposto em `docs/specs/PROTOCOLO_PROMPT_V1.2.md`, aguardando aprovação.
+
+### D-020 — Risco aceito: alertas moderados na cadeia do Tailwind 3 *(Aceita em 2026-10-23)*
+**Contexto:** `npm audit` aponta 4 ocorrências moderadas (GHSA-rj75-hqrm-r3gf, complexidade quadrática no `postcss-selector-parser`) via Tailwind 3.4.19, postcss-nested e tailwindcss-animate. Não há correção dentro da linha 3.
+**Decisão:** aceitar o risco. A ferramenta só roda no build e processa apenas CSS do próprio repositório; não há entrada de CSS por usuários e nada disso entra no bundle. Reavaliar ao planejar a migração para o Tailwind v4 (D-004), após a paridade visual.

@@ -7,32 +7,32 @@ Itens **Alterado** seguem a nova regra decidida pelo responsável (não a REF) e
 Status: ⬜ Não iniciado · 🟨 Em andamento · 🟦 Implementado (sem evidência) · ✅ Verificado · ⛔ Bloqueado
 REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 
-**Paridade atual comprovada: 0 / 102 itens (0%).**
+**Paridade atual comprovada: 7 / 102 itens (6,9%)** — após aprovação da TASK-001 (vale quando o PR #2 for mesclado).
 
 ## Fundação e visual
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
 |---|---|---|---|---|---|---|
-| V-01 | `index.html` `lang="pt-BR"`, título "Protocolo de Inteligência CX", Fraunces + Inter | §9.3 | Visual | Paridade | teste de build/HTML | ⬜ |
-| V-02 | Tokens HSL `:root` exatos | §9.1 | Visual | Paridade | teste comparando CSS | ⬜ |
-| V-03 | `tailwind.config.js`: cores por token, radius, fontes, opacity 1%, animate | §9.2 | Visual | Paridade | revisão + build | ⬜ |
+| V-01 | `index.html` `lang="pt-BR"`, título "Protocolo de Inteligência CX", Fraunces + Inter | §9.3 | Visual | Paridade | `html.test.js` (PR #2) | ✅ |
+| V-02 | Tokens HSL `:root` exatos | §9.1 | Visual | Paridade | `tokens.test.js` (PR #2) | ✅ |
+| V-03 | `tailwind.config.js`: cores por token, radius, fontes, opacity 1%, animate | §9.2 | Visual | Paridade | revisão PR #2 + build CI | ✅ |
 | V-04 | Layout: sidebar `w-64` ≥ lg, logo `HeartHandshake`, e-mail + papel + Sair | §8 Layout | Visual | Paridade | teste de componente + screenshot | ⬜ |
 | V-05 | Topbar mobile sticky com pills; ativo `bg-primary` | §8 Layout | Visual | Paridade | screenshot mobile | ⬜ |
 | V-06 | Itens de menu por papel (Painel, Avaliações, Nova avaliação, Curadoria, Satisfação, Protocolo, Meu desenvolvimento) | §8 Layout | Funcional | Paridade | teste por papel | ⬜ |
 | V-07 | Cards `rounded-2xl border bg-card`, títulos `font-heading`, placeholders dashed, `Loader2` | §8 | Visual | Paridade | screenshot | ⬜ |
 | V-08 | Estilos de badges (classificação, gravidade, tendência, status) | §5 | Visual | Paridade | snapshot | ⬜ |
 | V-09 | UI integralmente em pt-BR; datas `pt-BR` | §2 | Visual | Paridade | revisão + teste formatDate | ⬜ |
-| V-10 | Sem erros de console; build ESM sem `require` | §12 | Técnico | Paridade | lint + e2e | ⬜ |
+| V-10 | Sem erros de console; build ESM sem `require` | §12 | Técnico | Paridade | lint anti-`require` ✅ (PR #2); console sem erros ⬜ (e2e) | 🟨 |
 
 ## Rotas e acesso
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
 |---|---|---|---|---|---|---|
-| R-01 | Todas as rotas da REF registradas | §3 | Funcional | Paridade | teste de rotas | ⬜ |
+| R-01 | Todas as rotas da REF registradas | §3 | Funcional | Paridade | `routes.test.jsx` (PR #2) | ✅ |
 | R-02 | Auth: login, register, forgot, reset | §3 | Funcional | Paridade | e2e | ⬜ |
 | R-03 | Rotas protegidas redirecionam para `/login` | §3 | Segurança | Paridade | teste | ⬜ |
 | R-04 | `/` redireciona analista → `/meu-desenvolvimento` | §3 | Funcional | Paridade | teste | ⬜ |
 | R-05 | `/curadoria` e `/satisfacao` redirecionam não supervisor → `/` | §3 | Funcional | Paridade | teste | ⬜ |
 | R-06 | `/pesquisa/:token` pública, fora do layout | §3 | Funcional | Paridade | teste | ⬜ |
-| R-07 | Página 404 | §3 | Funcional | Paridade | teste | ⬜ |
+| R-07 | Página 404 | §3 | Funcional | Paridade | `routes.test.jsx` (PR #2) | ✅ |
 
 ## Dados e segurança
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
@@ -125,8 +125,8 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | P-45 | Edge Functions validam papel | — | Segurança | SEC-12 | teste | ⬜ |
 | P-46 | Logs de falha sem PII | — | Segurança | SEC-14 | teste | ⬜ |
 | P-47 | Varredura de segredos no CI | — | Segurança | SEC-01 | CI | ⬜ |
-| P-48 | Pipeline CI (lint, test, build) | — | Técnico | — | CI verde | ⬜ |
-| P-49 | Documentação de execução local | — | Técnico | — | README | ⬜ |
+| P-48 | Pipeline CI (lint, test, build) | — | Técnico | — | CI run 39986235495 | ✅ |
+| P-49 | Documentação de execução local | — | Técnico | — | README (PR #2) | ✅ |
 | P-50 | Auditoria de custos (planos gratuitos) | — | Infra | — | relatório Fase 6 | ⬜ |
 | P-51 | Defaults de oportunidade (Desejável / Indeterminada / Médio / pendente) | README-DEV C.3 | Funcional | Paridade | teste | ⬜ |
 | P-52 | Classificação calculada pelo sistema, não confiada ao LLM | README-DEV C.3 | Funcional | Paridade | teste | ⬜ |

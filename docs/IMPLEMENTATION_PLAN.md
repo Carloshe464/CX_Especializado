@@ -12,7 +12,8 @@ Pendências que **não bloqueiam a Fase 1**: Supabase MCP indisponível nesta se
 |---|---|---|
 | TASK-001 | Vite + React 18 + Tailwind v3 + shadcn base + Router v7 + cliente Supabase + tokens + ESLint + Vitest + CI | Fase 0 |
 | TASK-002 | `src/lib/cx.js` completo com testes (itens D-01…D-07) | TASK-001 |
-| TASK-003 | `CxLayout` (sidebar/topbar), `StatCard` e componentes shadcn necessários, com papel simulado em testes | TASK-001 |
+| TASK-003 | `CxLayout` (sidebar/topbar), `StatCard` e componentes shadcn necessários, com papel simulado em testes; confirmar nomes dos ícones no `lucide-react` 1.x | TASK-001 |
+| TASK-004 | Manutenção da toolchain: ESLint na linha suportada, `actions/checkout`/`setup-node` atuais, `engines.node >=22.22.2` | TASK-001 |
 
 Saída: build e CI verdes; V-01…V-03, V-09, V-10, R-01, R-07, D-01…D-07, P-48, P-49 verificados.
 
