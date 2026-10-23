@@ -1,0 +1,15 @@
+{
+  "name": "Protocolo de Inteligência CX",
+  "short_name": "Protocolo CX",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
+
