@@ -1,43 +1,73 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { AppRoutes } from '@/App'
+import { SessionProvider } from '@/auth/SessionContext'
 
-const routes = [
-  ['/login', 'Entrar', false],
-  ['/register', 'Criar conta', false],
-  ['/forgot-password', 'Esqueci minha senha', false],
-  ['/reset-password', 'Redefinir senha', false],
-  ['/pesquisa/token-ficticio', 'Pesquisa de satisfação', false],
-  ['/', 'Painel', true],
-  ['/avaliacoes', 'Avaliações', true],
-  ['/nova-avaliacao', 'Nova avaliação', true],
-  ['/avaliacao/id-ficticio', 'Avaliação', true],
-  ['/curadoria', 'Curadoria', true],
-  ['/meu-desenvolvimento', 'Meu desenvolvimento', true],
-  ['/satisfacao', 'Satisfação', true],
-  ['/protocolo', 'Protocolo', true],
-  ['/rota-inexistente', 'Página não encontrada', false],
+vi.mock('@/lib/supabaseClient', () => ({ supabase: null, supabaseConfigError: null }))
+
+const supervisor = { status: 'signed_in', user: { id: 'u', email: 'sup@exemplo.test' }, role: 'supervisor', organizationId: 'org-x' }
+
+const internal = [
+  ['/', 'Painel'],
+  ['/avaliacoes', 'Avaliações'],
+  ['/nova-avaliacao', 'Nova avaliação'],
+  ['/avaliacao/id-ficticio', 'Avaliação'],
+  ['/curadoria', 'Curadoria'],
+  ['/meu-desenvolvimento', 'Meu desenvolvimento'],
+  ['/satisfacao', 'Satisfação'],
+  ['/protocolo', 'Protocolo'],
 ]
 
-describe('rotas provisórias', () => {
-  it.each(routes)('%s renderiza %s com o layout esperado', (path, title, hasLayout) => {
-    render(<MemoryRouter initialEntries={[path]}><AppRoutes /></MemoryRouter>)
-    expect(screen.getByRole('heading', { level: 1, name: title })).toBeInTheDocument()
+const publicRoutes = [
+  ['/login', 'Entrar'],
+  ['/register', 'Criar conta'],
+  ['/forgot-password', 'Esqueci minha senha'],
+  ['/reset-password', 'Redefinir senha'],
+  ['/pesquisa/token-ficticio', 'Pesquisa de satisfação'],
+  ['/rota-inexistente', 'Página não encontrada'],
+]
+
+function renderAt(path, session) {
+  return render(
+    <SessionProvider value={session}>
+      <MemoryRouter initialEntries={[path]}><AppRoutes /></MemoryRouter>
+    </SessionProvider>,
+  )
+}
+
+describe('rotas internas', () => {
+  it.each(internal)('%s exige sessão e leva ao login', (path) => {
+    renderAt(path)
+    expect(screen.getByRole('heading', { level: 1, name: 'Entrar' })).toBeInTheDocument()
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+  })
+
+  it.each(internal)('%s renderiza %s dentro do layout para supervisor', (path, title) => {
+    renderAt(path, supervisor)
+    expect(within(screen.getByRole('main')).getByRole('heading', { level: 1, name: title })).toBeInTheDocument()
     expect(screen.getByText('Em construção.')).toBeInTheDocument()
-    expect(Boolean(screen.queryByRole('main'))).toBe(hasLayout)
-    if (hasLayout) {
-      expect(within(screen.getByRole('main')).getByRole('heading', { level: 1, name: title })).toBeInTheDocument()
-      expect(screen.getByRole('navigation', { name: 'Navegação principal (desktop)' })).toBeInTheDocument()
-    } else {
-      expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
-    }
+    expect(screen.getByRole('navigation', { name: 'Navegação principal (desktop)' })).toBeInTheDocument()
+  })
+})
+
+describe('rotas públicas', () => {
+  it.each(publicRoutes)('%s renderiza %s sem sessão e sem o menu interno', (path, title) => {
+    renderAt(path)
+    expect(screen.getByRole('heading', { level: 1, name: title })).toBeInTheDocument()
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+  })
+
+  it('/pesquisa/:token continua pública mesmo com sessão', () => {
+    renderAt('/pesquisa/token-ficticio', supervisor)
+    expect(screen.getByRole('heading', { level: 1, name: 'Pesquisa de satisfação' })).toBeInTheDocument()
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
   })
 
   it('o botão da 404 navega para o painel como link acessível', async () => {
     const user = userEvent.setup()
-    render(<MemoryRouter initialEntries={['/inexistente']}><AppRoutes /></MemoryRouter>)
+    renderAt('/inexistente', supervisor)
     const link = screen.getByRole('link', { name: 'Voltar para o painel' })
     expect(link).toHaveAttribute('href', '/')
     expect(link).toHaveClass('bg-primary')
