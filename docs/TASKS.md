@@ -11,9 +11,9 @@ Status só muda com evidência (PR, CI, relatório do operador).
 | TASK-003 | Layout `CxLayout` + componentes base | 1 | Operador | **TASK-004 mesclada** | `task/003-layout` | ✅ mesclada (PR #8) |
 | TASK-004 | Manutenção da toolchain (ESLint suportado, `engines`; actions só ao reativar CI) | 1 | Operador | TASK-001 · paralela à 002 | `task/004-toolchain` | ✅ mesclada parcial (PR #5, D-022) |
 | TASK-010 | Banco local: identidade, organizações, papéis, entrada por domínio | 2 | Operador | TASK-001 · **paralela à 003** | PR #11 | ✅ mesclada |
-| TASK-011 | Banco local: entidades de negócio + integridade + seed | 2 | Operador | **TASK-010 mesclada** | `task/011-entidades` | 📝 liberada |
-| TASK-014 | Auth no frontend: e-mail/senha + Google, ProtectedRoute, redirecionamentos por papel, onboarding | 2 | Operador | TASK-003 ✅ + **TASK-010 mesclada** · paralela à 011 | `task/014-auth` | 📝 liberada (paralela à 011) |
-| TASK-012 | Banco local: RLS de negócio, RPCs de validação/curadoria, `effective_feedback` | 2 | Operador | **TASK-011 mesclada** · paralela à 014 | `task/012-rls-negocio` | 📝 (aguarda 011) |
+| TASK-011 | Banco local: entidades de negócio + integridade + seed | 2 | Operador | **TASK-010 mesclada** | `task/011-entidades-negocio` | ✅ PR #16 |
+| TASK-014 | Auth no frontend: e-mail/senha + Google, ProtectedRoute, redirecionamentos por papel, onboarding | 2 | Operador | TASK-003 ✅ + **TASK-010 mesclada** · paralela à 011 | `claude/magical-hamilton-06itj1` | ✅ PR #15 |
+| TASK-012 | Banco local: RLS de negócio, RPCs de validação/curadoria, `effective_feedback` | 2 | Operador | **TASK-011 mesclada** · paralela à 014 | `task/012-rls-negocio` | 📝 liberada |
 | TASK-013 | Storage privado + `evaluation_files` + serviço de upload/URL assinada | 2 | Operador | **TASK-012 mesclada** | `task/013-storage` | 📝 (aguarda 012) |
 | TASK-015 | Revisão de segurança da Fase 2 + pedido de autorização para o remoto | 2 | Orquestrador | 011–014 mescladas | — | 💤 |
 | TASK-020…025 | Motor de IA + configuração de provedor | 3 | Operador | Fase 2 + escolha do primeiro adaptador de provedor | — | 💤 |
@@ -24,14 +24,19 @@ Status só muda com evidência (PR, CI, relatório do operador).
 2. **Onda 2:** TASK-003, depois da TASK-004 mesclada (conflito de `package.json`/lockfile e regras de lint).
 
 ## Ordem de execução da Fase 2
-1. **Agora (paralelo):** TASK-003 (frontend) e TASK-010 (banco). Arquivos disjuntos: `src/`+`package.json` × `supabase/`.
-2. **Depois da TASK-010 mesclada:** TASK-011.
-3. **Depois da TASK-011:** TASK-012 (RLS/RPCs); **depois da TASK-012:** TASK-013 (Storage). A TASK-014 (Auth no frontend) já está liberada.
+1. ✅ TASK-003 e TASK-010 (paralelas); ✅ TASK-011 e TASK-014 (paralelas).
+2. **Agora:** TASK-012 (RLS/RPCs de negócio).
+3. **Depois da TASK-012:** TASK-013 (Storage).
 4. **TASK-015:** revisão de segurança pelo orquestrador + pedido de autorização para aplicar no remoto.
 
 ## Backlog identificado em revisões
 - Gestão de membros: inclusão ou convite pelo admin/supervisor, para empresas sem domínio, e promoção/remoção pela interface (origem: revisão da TASK-010).
 - Configuração remota de auth (tamanho mínimo de senha 8, `site_url`, Google) na TASK-015.
+- `minimum_password_length = 8` também no `supabase/config.toml` local (servidor aceita 6; a interface exige 8) — TASK-015 (origem: revisão da TASK-014).
+- Templates de e-mail com `token_hash` + `verifyOtp`: com PKCE, o link de confirmação/redefinição só funciona no mesmo navegador. Resolver antes de publicar — TASK-015.
+- Botão "Sair" no cabeçalho móvel do `Layout` (hoje só existe na barra lateral do desktop) — correção pequena, junto da Fase 4.
+- *Code splitting* das páginas internas (bundle de 512 kB) — Fase 4.
+- Avaliação com execução, ticket de pesquisa ou arquivo não pode ser apagada (FKs da TASK-011); para rascunho com arquivo, apagar antes o objeto no Storage — conferir na TASK-013.
 
 ## Bloqueios e pendências do responsável
 1. ~~Criar `main` e defini-la como padrão~~ — feito.
@@ -43,6 +48,8 @@ Status só muda com evidência (PR, CI, relatório do operador).
 ## Registro de revisões
 | Tarefa | PR | Commit revisado | Resultado | Evidência |
 |---|---|---|---|---|
+| TASK-014 | #15 | `a62968f` | ✅ Aprovada (squash, sem as capturas PNG no histórico); desvios aceitos: branch, `AuthProvider` dentro do roteador, `PublicOnlyRoute`, indicador de recuperação em `sessionStorage` | saídas locais (lint 0, 301 testes, build, 102 pgTAP), `grep` do `dist/`, roteiro manual com Mailpit/Playwright e capturas 1280/375 |
+| TASK-011 | #16 | `1627990` | ✅ Aprovada; guards de `TRUNCATE` extras aceitos; inventário de `00_estrutura` relaxado (SEC-16 mantido) | saídas locais (355/355 pgTAP, `db lint`, lint 0, 227 testes, build) e comparação literal das listas com `cx.js`; revisão linha a linha da migração |
 | TASK-001 | #2 | `21f7f8f` | ✅ Aprovada; 5 pontos não bloqueantes → TASK-004/TASK-003/D-020 | CI run 39986235495 (lint 0 warnings, 73 testes, build); revisão do diff completo |
 | TASK-001 | #2 | `fe7427a` | Commit do orquestrador: CI só manual (D-021), sem efeito no código da aplicação | diff de 1 arquivo (`ci.yml`) |
 | TASK-004 | #5 | `498a86e` | ✅ Aprovada como parcial: `engines.node >=22.22.2`; ESLint 10 bloqueado pelo peer de `eslint-plugin-react` (D-022) | saídas locais no PR (lint 0, 73 testes, build, anti-`require`, audit antes/depois); diff 2+/2− |

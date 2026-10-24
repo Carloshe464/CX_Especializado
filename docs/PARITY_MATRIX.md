@@ -7,7 +7,7 @@ Itens **Alterado** seguem a nova regra decidida pelo responsável (não a REF) e
 Status: ⬜ Não iniciado · 🟨 Em andamento · 🟦 Implementado (sem evidência) · ✅ Verificado · ⛔ Bloqueado
 REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 
-**Paridade atual comprovada: 18 / 102 itens (17,6%)**, com TASK-001 (PR #2), TASK-002 (PR #4) e TASK-003 (PR #8) mescladas.
+**Paridade atual comprovada: 25 / 102 itens (24,5%)**, com TASK-001 (PR #2), TASK-002 (PR #4), TASK-003 (PR #8), TASK-010 (PR #11), TASK-011 (PR #16) e TASK-014 (PR #15) mescladas.
 
 ## Fundação e visual
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
@@ -27,22 +27,22 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
 |---|---|---|---|---|---|---|
 | R-01 | Todas as rotas da REF registradas | §3 | Funcional | Paridade | `routes.test.jsx` (PR #2) | ✅ |
-| R-02 | Auth: login, register, forgot, reset | §3 | Funcional | Paridade | e2e | ⬜ |
-| R-03 | Rotas protegidas redirecionam para `/login` | §3 | Segurança | Paridade | teste | ⬜ |
-| R-04 | `/` redireciona analista → `/meu-desenvolvimento` | §3 | Funcional | Paridade | teste | ⬜ |
-| R-05 | `/curadoria` e `/satisfacao` redirecionam não supervisor → `/` | §3 | Funcional | Paridade | teste | ⬜ |
-| R-06 | `/pesquisa/:token` pública, fora do layout | §3 | Funcional | Paridade | teste | ⬜ |
+| R-02 | Auth: login, register, forgot, reset | §3 | Funcional | Paridade | `auth-pages.test.jsx` + roteiro manual local com Mailpit/Playwright (PR #15) | ✅ |
+| R-03 | Rotas protegidas redirecionam para `/login` | §3 | Segurança | Paridade | `guards.test.jsx` (PR #15) | ✅ |
+| R-04 | `/` redireciona analista → `/meu-desenvolvimento` | §3 | Funcional | Paridade | `routes.test.jsx` + `guards.test.jsx` (PR #15) | ✅ |
+| R-05 | `/curadoria` e `/satisfacao` redirecionam não supervisor → `/` | §3 | Funcional | Paridade | `routes.test.jsx` + `guards.test.jsx` (PR #15) | ✅ |
+| R-06 | `/pesquisa/:token` pública, fora do layout | §3 | Funcional | Paridade | `routes.test.jsx` (PR #15) | ✅ |
 | R-07 | Página 404 | §3 | Funcional | Paridade | `routes.test.jsx` (PR #2) | ✅ |
 
 ## Dados e segurança
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
 |---|---|---|---|---|---|---|
-| S-01 | 9 entidades + perfis em PostgreSQL | §4 | Funcional | D-002, D-010 | migração + testes | ⬜ |
+| S-01 | 9 entidades + perfis em PostgreSQL | §4 | Funcional | D-002, D-010 | migração + testes | 🟨 tabelas e integridade (PR #16, 253 testes pgTAP); RLS de negócio na TASK-012 |
 | S-02 | Analista vê só os próprios dados | §4 | Segurança | Paridade | matriz RLS | ⬜ |
 | S-03 | Analista vê a análise só das próprias avaliações; nunca de outro analista ou outra organização | §1, §7.4 | Segurança | **Alterado D-011** | matriz RLS | ⬜ |
 | S-04 | Veredito de supervisor só por supervisor da organização (API e banco); prevalece sobre o do analista | §4 | Segurança | Corrigido D-007#2 + D-011 | matriz RLS | ⬜ |
-| S-05 | `curation_logs` imutável | §4.6 | Segurança | Corrigido | teste | ⬜ |
-| S-06 | Papel não controlável pelo usuário | — | Segurança | SEC-04 | teste | ⬜ |
+| S-05 | `curation_logs` imutável | §4.6 | Segurança | Corrigido | pgTAP `03_entidades_negocio` (CX021, inclusive como `postgres` e `TRUNCATE`) (PR #16) | ✅ |
+| S-06 | Papel não controlável pelo usuário | — | Segurança | SEC-04 | pgTAP `01_entrada`/`02_acesso` (CX016) (PR #11) + `AuthProvider.test.jsx` ignora metadata (PR #15) | ✅ |
 | S-07 | Storage privado com URLs assinadas 3600 s | §10 | Segurança | Paridade | teste | ⬜ |
 | S-08 | Sem acesso `anon` a tabelas internas | §4.5 | Segurança | Corrigido | teste | ⬜ |
 | S-09 | Seed `csat_positive_threshold=4` e `ProtocolVersion V1.1` | §11.7 | Funcional | Paridade | teste de seed | ⬜ |
@@ -138,8 +138,8 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 ## Funcionalidades novas (fora da paridade — não entram no percentual)
 | ID | Funcionalidade | Decisão | Especificação | Status |
 |---|---|---|---|---|
-| N-01 | Organizações, vínculos e admin da plataforma | D-002, D-017 | ARCHITECTURE §3 | 🟨 banco local pronto (PR #11, 102 testes pgTAP); interface na TASK-014 |
-| N-02 | Login Google + cadastro aberto | D-008 | ARCHITECTURE §3 | ⬜ |
+| N-01 | Organizações, vínculos e admin da plataforma | D-002, D-017 | ARCHITECTURE §3 | ✅ banco (PR #11) + cadastro/onboarding na interface (PR #15) |
+| N-02 | Login Google + cadastro aberto | D-008 | ARCHITECTURE §3 | 🟨 cadastro aberto e botão Google com PKCE (PR #15); credenciais reais do Google pendentes (TASK-015) |
 | N-03 | Validação do analista (gostei/útil/comentário) em diagnóstico e oportunidades | D-011 | specs/VALIDACAO_E_CURADORIA | ⬜ |
 | N-04 | Veredito do supervisor com prioridade | D-011 | specs/VALIDACAO_E_CURADORIA | ⬜ |
 | N-05 | Taxa de utilidade da IA (individual p/ analista; organização p/ supervisor) | D-011 | specs/VALIDACAO_E_CURADORIA | ⬜ |
