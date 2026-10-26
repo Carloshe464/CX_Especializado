@@ -15,7 +15,9 @@ Status só muda com evidência (PR, CI, relatório do operador).
 | TASK-014 | Auth no frontend: e-mail/senha + Google, ProtectedRoute, redirecionamentos por papel, onboarding | 2 | Operador | TASK-003 ✅ + **TASK-010 mesclada** · paralela à 011 | `claude/magical-hamilton-06itj1` | ✅ PR #15 |
 | TASK-012 | Banco local: RLS de negócio, RPCs de validação/curadoria, `effective_feedback` | 2 | Operador | **TASK-011 mesclada** · paralela à 014 | `laikc/great-mayer-la33ql` | ✅ PR #18 |
 | TASK-013 | Storage privado + `evaluation_files` + serviço de upload/URL assinada | 2 | Operador | **TASK-012 mesclada** | `task/013-storage` | ✅ PR #20 |
-| TASK-015 | Auth por `token_hash` + senha 8; inventário remoto somente leitura; aplicação no Supabase real só com autorização (3 etapas com portões) | 2 | Operador (Codex, conector Supabase) + revisão do orquestrador | 010–014 mescladas ✅ | `task/015-supabase-remoto` | 📝 liberada (etapas 1–2) |
+| TASK-015 | Auth por `token_hash` + senha 8; inventário remoto; 4 migrações aplicadas no Supabase real (canal A) | 2 | Operador (Codex) + revisão do orquestrador | 010–014 ✅ | `task/015-supabase-remoto` | ✅ PR #23 |
+| TASK-030 | Base da Fase 4: "Sair" no celular, páginas sob demanda, massa de dados local (`scripts/seed-local.mjs`) | 4 | Operador | TASK-015 ✅ · paralela à 031 | `task/030-base-fase4` | 📝 liberada |
+| TASK-031 | Tela Avaliações (`/avaliacoes`) | 4 | Operador | TASK-015 ✅ · paralela à 030 | `task/031-avaliacoes` | 📝 liberada |
 | TASK-020…025 | Motor de IA + configuração de provedor | 3 | Operador | Fase 2 + escolha do primeiro adaptador de provedor | — | 💤 |
 | TASK-040…044 | Extensão de captura | E | Operador | Fase 4 + exemplo de URL/DOM do ClickDesk | — | 💤 |
 
@@ -27,13 +29,19 @@ Status só muda com evidência (PR, CI, relatório do operador).
 1. ✅ TASK-003 e TASK-010 (paralelas); ✅ TASK-011 e TASK-014 (paralelas).
 2. ✅ TASK-012 (RLS/RPCs de negócio).
 3. ✅ TASK-013 (Storage).
-4. **Agora — TASK-015:** etapas 1–2 (correções locais + inventário remoto só leitura) → revisão do orquestrador → autorização escrita do responsável → etapa 3 (aplicação e verificação remota).
+4. ✅ TASK-015: migrações aplicadas no Supabase real (`ymsyabgztkfhdllbxfyc`) em 26/10/2026.
+
+## Ordem de execução da Fase 4
+1. **Agora (paralelo):** TASK-030 (base) e TASK-031 (Avaliações).
+2. TASK-032 Nova avaliação → TASK-033 Detalhe com validação do analista → TASK-034 Curadoria → TASK-035 Meu desenvolvimento.
+3. Sem IA (Fase 3 no final): telas de análise são construídas e testadas com análises fictícias da massa local.
 
 ## Backlog identificado em revisões
 - Gestão de membros: inclusão ou convite pelo admin/supervisor, para empresas sem domínio, e promoção/remoção pela interface (origem: revisão da TASK-010).
 - Configuração remota de auth (tamanho mínimo de senha 8, `site_url`, Google) na TASK-015.
-- `minimum_password_length = 8` também no `supabase/config.toml` local (servidor aceita 6; a interface exige 8) — TASK-015 (origem: revisão da TASK-014).
-- Templates de e-mail com `token_hash` + `verifyOtp`: com PKCE, o link de confirmação/redefinição só funciona no mesmo navegador. Resolver antes de publicar — TASK-015.
+- ~~`minimum_password_length = 8` no `config.toml` local~~ — feito na TASK-015.
+- Templates `token_hash` prontos no repositório (TASK-015), mas **bloqueados no remoto**: projeto Free com SMTP padrão não permite editar templates e só envia para a equipe (2/h). **SMTP próprio é pré-requisito da publicação** — decisão do responsável.
+- Painel de Auth remoto (responsável): senha mínima 8; Site URL e redirects `http://localhost:5173` (provisórios até a Fase 6).
 - Botão "Sair" no cabeçalho móvel do `Layout` (hoje só existe na barra lateral do desktop) — correção pequena, junto da Fase 4.
 - *Code splitting* das páginas internas (bundle de 512 kB) — Fase 4.
 - Fase 3: a Edge Function só aponta `current_analysis_run_id` para execução com `sucesso` (`decide_opportunity` confere só a execução atual) (origem: revisão da TASK-012).
@@ -47,13 +55,14 @@ Status só muda com evidência (PR, CI, relatório do operador).
 ## Bloqueios e pendências do responsável
 1. ~~Criar `main` e defini-la como padrão~~ — feito.
 2. ~~README-DEV~~ — incorporado em `docs/reference/README-DEV_AUDITORIA_TECNICA.md`.
-3. **Supabase MCP** não está conectado nesta sessão; verificação somente leitura do projeto pendente.
+3. ~~Supabase MCP~~ — conector do operador (Codex) com acesso à organização Especializado; projeto `ymsyabgztkfhdllbxfyc`.
 4. Decisões de produto fechadas em 2026-10-23 (ver `docs/DECISIONS.md` e `docs/specs/`). Pendências menores: confirmar "retorno positivo" = gostei **e** útil; primeiro adaptador de provedor de IA (pode ficar para a Fase 3).
 5. Acesso à aplicação original no Base44 (somente leitura) para capturas de tela de referência (P-39).
 
 ## Registro de revisões
 | Tarefa | PR | Commit revisado | Resultado | Evidência |
 |---|---|---|---|---|
+| TASK-015 | #23 | `736e6e0` | ✅ Aprovada; portões cumpridos (aprovação condicionada + inventário; autorização escrita, canal A); 4 migrações aplicadas com versões iguais às locais; 7 WARN `authenticated_security_definer_function_executable` aceitos (RPCs previstas, `anon` revogado, papel validado internamente) | saídas de `db push --dry-run`/`db push`; verificação somente leitura SEC-09/10/11/15/16/19; hashes das 27 funções e 33 políticas iguais ao local |
 | TASK-013 | #20 | `d0e93b1` | ✅ Aprovada; CX037–CX038; teste usa `storage.allow_delete_query` só na transação sintética (aceito); §8b comprovado | saídas locais (659/659 pgTAP, `db lint`, `db advisors` security, lint 0, 324 testes, build) e teste real no navegador (URL assinada 200, sem token 400, TTL 3600) |
 | TASK-012 | #18 | `6817194` | ✅ Aprovada; códigos CX023–CX036; políticas de `evaluations` em linha (INSERT … RETURNING) e regras extras aceitas; relatório diz que `decide_opportunity` exige `sucesso`, o código só exige execução atual (risco nulo, registrado para a Fase 3) | saídas locais (562/562 pgTAP, `db lint`, lint 0, 301 testes, build); revisão linha a linha da migração e da matriz |
 | TASK-014 | #15 | `a62968f` | ✅ Aprovada (squash, sem as capturas PNG no histórico); desvios aceitos: branch, `AuthProvider` dentro do roteador, `PublicOnlyRoute`, indicador de recuperação em `sessionStorage` | saídas locais (lint 0, 301 testes, build, 102 pgTAP), `grep` do `dist/`, roteiro manual com Mailpit/Playwright e capturas 1280/375 |
