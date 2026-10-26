@@ -7,7 +7,7 @@ Itens **Alterado** seguem a nova regra decidida pelo responsável (não a REF) e
 Status: ⬜ Não iniciado · 🟨 Em andamento · 🟦 Implementado (sem evidência) · ✅ Verificado · ⛔ Bloqueado
 REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 
-**Paridade atual comprovada: 32 / 102 itens (31,4%)**, com TASK-001 (PR #2), TASK-002 (PR #4), TASK-003 (PR #8), TASK-010 (PR #11), TASK-011 (PR #16), TASK-014 (PR #15), TASK-012 (PR #18) e TASK-013 (PR #20) mescladas.
+**Paridade atual comprovada: 32 / 102 itens (31,4%)**, com TASK-001 (PR #2), TASK-002 (PR #4), TASK-003 (PR #8), TASK-010 (PR #11), TASK-011 (PR #16), TASK-014 (PR #15), TASK-012 (PR #18) e TASK-013 (PR #20) mescladas. Parciais (🟨) não entram na contagem.
 
 ## Fundação e visual
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
@@ -85,7 +85,7 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | P-05 | Dashboard: AnalystComparison | §7.1 | Funcional | Paridade | teste | ⬜ |
 | P-06 | Dashboard: comportamento × satisfação com aviso de não causalidade | §7.1 | Funcional | Paridade | teste | ⬜ |
 | P-07 | Indicadores sem limites fixos | §7.1 | Integridade | Corrigido D-007#4 | teste com > 1000 registros | ⬜ |
-| P-08 | Avaliações: lista, busca, badges, "Nota real", empty state | §7.2 | Funcional | Paridade | teste | ⬜ |
+| P-08 | Avaliações: lista, busca, badges, "Nota real", empty state | §7.2 | Funcional | Paridade | teste | 🟨 TASK-031 (PR #25): lista, busca, badges, "Nota real" com limiar por organização e estados testados (`Evaluations.test.jsx`, `evaluations.test.js`); falta "Importar planilha" (Fase 5) |
 | P-09 | Nova avaliação: campos, canais, analista travado p/ analista | §7.3 | Funcional | Paridade (+D-013) | teste | ⬜ |
 | P-10 | Nova avaliação: aba colar conversa sem limite | §7.3 | Funcional | Paridade | teste | ⬜ |
 | P-11 | Nova avaliação: aba prints (upload privado, extrair) | §7.3 | Funcional | Paridade | e2e | ⬜ |
