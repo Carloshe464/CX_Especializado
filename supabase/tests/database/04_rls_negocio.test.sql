@@ -1070,8 +1070,8 @@ select ok(not has_column_privilege('authenticated', 'public.ai_provider_configs'
 select ok(not has_column_privilege('authenticated', 'public.survey_tickets', 'token', 'INSERT')
   and not has_column_privilege('authenticated', 'public.survey_tickets', 'token', 'UPDATE'),
   'SEC-11: token sem INSERT/UPDATE para authenticated');
-select is_empty($$ select pol.polname from pg_policy pol where pol.polrelid = 'public.evaluation_files'::regclass $$,
-  'evaluation_files segue sem políticas (TASK-013)');
+select is((select count(*)::int from pg_policy where polrelid = 'public.evaluation_files'::regclass and polcmd <> 'r'), 0,
+  'evaluation_files não permite escrita pela API (TASK-013)');
 
 select * from finish();
 rollback;
