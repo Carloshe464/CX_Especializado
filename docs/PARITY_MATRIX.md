@@ -7,7 +7,7 @@ Itens **Alterado** seguem a nova regra decidida pelo responsável (não a REF) e
 Status: ⬜ Não iniciado · 🟨 Em andamento · 🟦 Implementado (sem evidência) · ✅ Verificado · ⛔ Bloqueado
 REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 
-**Paridade atual comprovada: 25 / 102 itens (24,5%)**, com TASK-001 (PR #2), TASK-002 (PR #4), TASK-003 (PR #8), TASK-010 (PR #11), TASK-011 (PR #16) e TASK-014 (PR #15) mescladas.
+**Paridade atual comprovada: 31 / 102 itens (30,4%)**, com TASK-001 (PR #2), TASK-002 (PR #4), TASK-003 (PR #8), TASK-010 (PR #11), TASK-011 (PR #16), TASK-014 (PR #15) e TASK-012 (PR #18) mescladas.
 
 ## Fundação e visual
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
@@ -37,15 +37,15 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 ## Dados e segurança
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
 |---|---|---|---|---|---|---|
-| S-01 | 9 entidades + perfis em PostgreSQL | §4 | Funcional | D-002, D-010 | migração + testes | 🟨 tabelas e integridade (PR #16, 253 testes pgTAP); RLS de negócio na TASK-012 |
-| S-02 | Analista vê só os próprios dados | §4 | Segurança | Paridade | matriz RLS | ⬜ |
-| S-03 | Analista vê a análise só das próprias avaliações; nunca de outro analista ou outra organização | §1, §7.4 | Segurança | **Alterado D-011** | matriz RLS | ⬜ |
-| S-04 | Veredito de supervisor só por supervisor da organização (API e banco); prevalece sobre o do analista | §4 | Segurança | Corrigido D-007#2 + D-011 | matriz RLS | ⬜ |
+| S-01 | 9 entidades + perfis em PostgreSQL | §4 | Funcional | D-002, D-010 | migrações + pgTAP `03`/`04` (PR #16, #18) | ✅ |
+| S-02 | Analista vê só os próprios dados | §4 | Segurança | Paridade | pgTAP `04_rls_negocio` (matriz 6 personas × 15 objetos) (PR #18) | ✅ |
+| S-03 | Analista vê a análise só das próprias avaliações; nunca de outro analista ou outra organização | §1, §7.4 | Segurança | **Alterado D-011** | pgTAP `04_rls_negocio` (A não lê avaliação/scores/oportunidades/feedback/CSAT de B; Y × X) (PR #18) | ✅ |
+| S-04 | Veredito de supervisor só por supervisor da organização (API e banco); prevalece sobre o do analista | §4 | Segurança | Corrigido D-007#2 + D-011 | pgTAP `04_rls_negocio` (RPCs `decide_*` só gestor; `effective_feedback` D-024) (PR #18) | ✅ |
 | S-05 | `curation_logs` imutável | §4.6 | Segurança | Corrigido | pgTAP `03_entidades_negocio` (CX021, inclusive como `postgres` e `TRUNCATE`) (PR #16) | ✅ |
 | S-06 | Papel não controlável pelo usuário | — | Segurança | SEC-04 | pgTAP `01_entrada`/`02_acesso` (CX016) (PR #11) + `AuthProvider.test.jsx` ignora metadata (PR #15) | ✅ |
 | S-07 | Storage privado com URLs assinadas 3600 s | §10 | Segurança | Paridade | teste | ⬜ |
-| S-08 | Sem acesso `anon` a tabelas internas | §4.5 | Segurança | Corrigido | teste | ⬜ |
-| S-09 | Seed `csat_positive_threshold=4` e `ProtocolVersion V1.1` | §11.7 | Funcional | Paridade | teste de seed | ⬜ |
+| S-08 | Sem acesso `anon` a tabelas internas | §4.5 | Segurança | Corrigido | pgTAP SEC-10 em `03`/`04` (`anon` sem privilégio em tabelas, view e RPCs) (PR #16, #18) | ✅ |
+| S-09 | Seed `csat_positive_threshold=4` e `ProtocolVersion V1.1` | §11.7 | Funcional | Paridade | pgTAP `03_entidades_negocio` (limiar 4; V1.1 inativa e V1.2 ativa, D-019) (PR #16) | ✅ |
 | S-10 | Protocolo único sob concorrência | — | Integridade | D-012 | teste concorrente | ⬜ |
 | S-11 | Arquivos sem órfãos | — | Integridade | D-007#9 | teste | ⬜ |
 
@@ -98,7 +98,7 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | P-18 | Detalhe: oportunidades com decisões do supervisor | §7.4 | Funcional | Paridade | teste | ⬜ |
 | P-19 | Detalhe não analisado: PrintGallery, editar/salvar transcrição, Analisar | §7.4 | Funcional | Paridade | teste | ⬜ |
 | P-20 | Curadoria: fila pendente + curadoria recente (10) | §7.5 | Funcional | Paridade | teste | ⬜ |
-| P-21 | Curadoria grava log por decisão | §7.4 | Funcional | Paridade | teste | ⬜ |
+| P-21 | Curadoria grava log por decisão | §7.4 | Funcional | Paridade | teste | 🟨 log atômico nas RPCs (PR #18); tela na Fase 4 |
 | P-22 | Meu desenvolvimento: só itens com veredito efetivo positivo, 3 StatCards | §7.6 | Funcional | **Alterado D-011** | teste | ⬜ |
 | P-23 | Meu desenvolvimento: barras por competência, cartões por avaliação | §7.6 | Funcional | Paridade | teste | ⬜ |
 | P-24 | Satisfação: StatCards | §7.7 | Funcional | Paridade | teste | ⬜ |
@@ -140,8 +140,8 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 |---|---|---|---|---|
 | N-01 | Organizações, vínculos e admin da plataforma | D-002, D-017 | ARCHITECTURE §3 | ✅ banco (PR #11) + cadastro/onboarding na interface (PR #15) |
 | N-02 | Login Google + cadastro aberto | D-008 | ARCHITECTURE §3 | 🟨 cadastro aberto e botão Google com PKCE (PR #15); credenciais reais do Google pendentes (TASK-015) |
-| N-03 | Validação do analista (gostei/útil/comentário) em diagnóstico e oportunidades | D-011 | specs/VALIDACAO_E_CURADORIA | ⬜ |
-| N-04 | Veredito do supervisor com prioridade | D-011 | specs/VALIDACAO_E_CURADORIA | ⬜ |
+| N-03 | Validação do analista (gostei/útil/comentário) em diagnóstico e oportunidades | D-011 | specs/VALIDACAO_E_CURADORIA | 🟨 RPC `submit_feedback` (PR #18); tela na Fase 4 |
+| N-04 | Veredito do supervisor com prioridade | D-011 | specs/VALIDACAO_E_CURADORIA | 🟨 RPCs `decide_*` + `effective_feedback` (PR #18); tela na Fase 4 |
 | N-05 | Taxa de utilidade da IA (individual p/ analista; organização p/ supervisor) | D-011 | specs/VALIDACAO_E_CURADORIA | ⬜ |
 | N-06 | Configuração de provedor/modelo/chave de IA pela interface | D-009 | specs/PROVEDOR_IA | ⬜ |
 | N-07 | Supervisor escolhe analista ao criar avaliação | D-013 | ARCHITECTURE §4 | ⬜ |

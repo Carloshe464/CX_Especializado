@@ -41,5 +41,18 @@ Regras obrigatórias para todos os agentes. Cada regra tem um identificador usad
 ## Testes exigidos (a partir da Fase 2)
 Para cada tabela: matriz `{admin da plataforma, supervisor org X, analista A org X, analista B org X, supervisor org Y, anon} × {select, insert, update, delete}` com resultado esperado, executada contra Supabase local. Casos obrigatórios: organização X não lê nada da organização Y; analista A não lê dados de B; analista não grava veredito de supervisor nem altera validação alheia por chamada direta; ninguém altera `curation_logs`; `anon` não lê `survey_tickets`.
 
+## Códigos de erro do banco (SQLSTATE próprios)
+Cada migração documenta os seus no topo. Faixas reservadas, para não colidir entre tarefas:
+
+| Faixa | Origem | Uso |
+|---|---|---|
+| CX001–CX016 | TASK-010 | entrada, organizações e papéis (CX001 = autenticação necessária, reaproveitado pelas RPCs seguintes) |
+| CX020–CX022 | TASK-011 | execução concluída imutável, log append-only, organização da resposta ≠ ticket |
+| CX023–CX036 | TASK-012 | validação, curadoria, versão do protocolo e proteção de `evaluations` |
+| CX037–CX039 | TASK-013 | Storage (se necessário) |
+| CX040+ | Fase 3 em diante | reservar na ordem de trabalho antes de usar |
+
+Mensagens de "não encontrado" e "sem permissão" são iguais quando a distinção revelaria dados de outra organização.
+
 ## Processo para mudanças remotas
 Nenhuma migração ou configuração é aplicada ao projeto Supabase remoto sem: (1) conteúdo e finalidade apresentados, (2) sintaxe validada localmente, (3) políticas revisadas, (4) testes demonstrados, (5) autorização explícita do responsável. O MCP do Supabase permanece somente leitura; não contornar por outro canal.
