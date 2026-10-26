@@ -20,6 +20,7 @@ Você é o operador de desenvolvimento do projeto **Protocolo CX 1.1** no reposi
 - Tudo é local; não altere migrações existentes; crie a nova com `supabase migration new storage_avaliacoes`.
 - No frontend, crie **apenas** os arquivos da §5. Não altere `package.json` nem o lockfile.
 - Não dispare o Actions (D-021); use dados sintéticos.
+- Códigos de erro próprios, se precisar: **CX037–CX039** (faixas em `docs/SECURITY.md`). Mensagens não podem revelar se a avaliação existe em outra organização.
 
 ### 1. Leitura obrigatória
 - `AGENTS.md`, `docs/SECURITY.md` (SEC-09) e `docs/ARCHITECTURE.md` §7.
@@ -99,6 +100,7 @@ Personas e massa como na TASK-012. Insira objetos com `insert into storage.objec
 6. **Triggers:** o upload cria `evaluation_files` com o `kind` correto por extensão, e a exclusão do objeto remove a linha.
 7. **`evaluation_files`:** A lê só os próprios; escrita direta pela API falha.
 8. A view de órfãos lista um objeto de avaliação removida.
+8b. **Exclusão de rascunho com arquivo:** `delete` da avaliação em `rascunho` com arquivo falha (FK de `evaluation_files`, `23503`) enquanto o objeto existir; depois que o dono apaga o objeto (o trigger remove a linha), a avaliação pode ser apagada. Registre o comportamento no relatório; a UI (Fase 4) apagará os arquivos antes da avaliação.
 9. SEC-15/SEC-16 para as funções e tabelas novas.
 
 ### 7. Validação local (saída real)
