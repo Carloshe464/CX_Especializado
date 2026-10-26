@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { AppRoutes } from '@/App'
 import { SessionProvider } from '@/auth/SessionContext'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 vi.mock('@/lib/supabaseClient', () => ({ supabase: null, supabaseConfigError: null }))
 
@@ -33,7 +34,9 @@ const publicRoutes = [
 function renderAt(path, session) {
   return render(
     <SessionProvider value={session}>
-      <MemoryRouter initialEntries={[path]}><AppRoutes /></MemoryRouter>
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <MemoryRouter initialEntries={[path]}><AppRoutes /></MemoryRouter>
+      </QueryClientProvider>
     </SessionProvider>,
   )
 }
@@ -49,7 +52,11 @@ describe('rotas internas', () => {
     renderAt(path, supervisor)
     expect(await screen.findByRole('heading', { level: 1, name: title })).toBeInTheDocument()
     expect(within(screen.getByRole('main')).getByRole('heading', { level: 1, name: title })).toBeInTheDocument()
-    expect(screen.getByText('Em construção.')).toBeInTheDocument()
+    if (path === '/avaliacoes') {
+      expect(screen.getByRole('searchbox', { name: 'Buscar avaliações' })).toBeInTheDocument()
+    } else {
+      expect(screen.getByText('Em construção.')).toBeInTheDocument()
+    }
     expect(screen.getByRole('navigation', { name: 'Navegação principal (desktop)' })).toBeInTheDocument()
   })
 })

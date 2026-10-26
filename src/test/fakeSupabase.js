@@ -23,6 +23,9 @@ export function createFakeSupabase({ session = null, tables = {} } = {}) {
       const query = {
         select: vi.fn(() => query),
         eq: vi.fn(() => query),
+        order: vi.fn(() => query),
+        limit: vi.fn(() => query),
+        then: (resolve, reject) => Promise.resolve(tables[table] ?? { data: [], error: null }).then(resolve, reject),
         maybeSingle: vi.fn(async () => tables[table] ?? { data: null, error: null }),
       }
       return query
