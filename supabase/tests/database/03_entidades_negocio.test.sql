@@ -312,9 +312,10 @@ select throws_ok('delete from public.organizations where id = ''00000000-0000-40
 update public.evaluations set transcript = 'Texto sintético', updated_at = '2000-01-01' where id = '00000000-0000-4000-8000-000000000100';
 select ok((select updated_at from public.evaluations where id = '00000000-0000-4000-8000-000000000100') = now(), 'updated_at é mantido pelo trigger estrutural da TASK-010');
 
--- Nenhuma política de negócio nesta fase: negação total até TASK-012.
+-- As políticas de negócio chegaram na TASK-012 (04_rls_negocio.test.sql). Aqui fica só o
+-- que continua valendo: evaluation_files sem políticas (TASK-013) e isolamento da organização.
 select is_empty($$ select c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relkind in ('r','p') and not c.relrowsecurity $$, 'SEC-16: todas as tabelas public têm RLS');
-select is_empty($$ select pol.polname from pg_policy pol join pg_class c on c.oid = pol.polrelid where c.relnamespace = 'public'::regnamespace and c.relname = any(array['ai_failures', 'ai_provider_configs', 'analysis_feedback', 'analysis_runs', 'app_settings', 'csat_records', 'curation_logs', 'evaluation_files', 'evaluation_scores', 'evaluations', 'opportunities', 'protocol_versions', 'survey_responses', 'survey_tickets']) $$, 'nenhuma tabela nova tem política RLS');
+select is_empty($$ select pol.polname from pg_policy pol join pg_class c on c.oid = pol.polrelid where c.relnamespace = 'public'::regnamespace and c.relname = 'evaluation_files' $$, 'evaluation_files segue sem política RLS até a TASK-013');
 select is_empty($$ select c.relname || ':' || privilege from pg_class c cross join unnest(array['SELECT','INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER']) privilege where c.relnamespace = 'public'::regnamespace and c.relkind in ('r','p') and has_table_privilege('anon', c.oid, privilege) $$, 'SEC-10: anon sem qualquer privilégio em tabelas public');
 select is_empty($$ select p.proname from pg_proc p where p.pronamespace = 'private'::regnamespace and p.proname in ('protect_analysis_run','protect_curation_log','check_survey_response_org','seed_organization_business') and (has_function_privilege('anon',p.oid,'EXECUTE') or has_function_privilege('authenticated',p.oid,'EXECUTE')) $$, 'funções estruturais novas não são executáveis pelos papéis da API');
 select ok((select count(*) > 0 from public.ai_failures), 'ai_failures: existem dados para provar a negação de leitura');
@@ -334,20 +335,20 @@ select ok((select count(*) > 0 from public.survey_tickets), 'survey_tickets: exi
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-000000000010","role":"authenticated"}', true);
 set local role authenticated;
 select ok(private.is_supervisor('00000000-0000-4000-8000-000000000001'), 'persona é supervisor da organização X');
-select is((select count(*) from public.ai_failures), 0::bigint, 'authenticated supervisor não lê ai_failures sem políticas');
-select is((select count(*) from public.ai_provider_configs), 0::bigint, 'authenticated supervisor não lê ai_provider_configs sem políticas');
-select is((select count(*) from public.analysis_feedback), 0::bigint, 'authenticated supervisor não lê analysis_feedback sem políticas');
-select is((select count(*) from public.analysis_runs), 0::bigint, 'authenticated supervisor não lê analysis_runs sem políticas');
-select is((select count(*) from public.app_settings), 0::bigint, 'authenticated supervisor não lê app_settings sem políticas');
-select is((select count(*) from public.csat_records), 0::bigint, 'authenticated supervisor não lê csat_records sem políticas');
-select is((select count(*) from public.curation_logs), 0::bigint, 'authenticated supervisor não lê curation_logs sem políticas');
-select is((select count(*) from public.evaluation_files), 0::bigint, 'authenticated supervisor não lê evaluation_files sem políticas');
-select is((select count(*) from public.evaluation_scores), 0::bigint, 'authenticated supervisor não lê evaluation_scores sem políticas');
-select is((select count(*) from public.evaluations), 0::bigint, 'authenticated supervisor não lê evaluations sem políticas');
-select is((select count(*) from public.opportunities), 0::bigint, 'authenticated supervisor não lê opportunities sem políticas');
-select is((select count(*) from public.protocol_versions), 0::bigint, 'authenticated supervisor não lê protocol_versions sem políticas');
-select is((select count(*) from public.survey_responses), 0::bigint, 'authenticated supervisor não lê survey_responses sem políticas');
-select is((select count(*) from public.survey_tickets), 0::bigint, 'authenticated supervisor não lê survey_tickets sem políticas');
+select is((select count(*) from public.ai_failures where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê ai_failures de outra organização');
+select is((select count(*) from public.ai_provider_configs where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê ai_provider_configs de outra organização');
+select is((select count(*) from public.analysis_feedback where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê analysis_feedback de outra organização');
+select is((select count(*) from public.analysis_runs where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê analysis_runs de outra organização');
+select is((select count(*) from public.app_settings where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê app_settings de outra organização');
+select is((select count(*) from public.csat_records where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê csat_records de outra organização');
+select is((select count(*) from public.curation_logs where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê curation_logs de outra organização');
+select is((select count(*) from public.evaluation_files), 0::bigint, 'authenticated supervisor não lê evaluation_files sem políticas (TASK-013)');
+select is((select count(*) from public.evaluation_scores where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê evaluation_scores de outra organização');
+select is((select count(*) from public.evaluations where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê evaluations de outra organização');
+select is((select count(*) from public.opportunities where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê opportunities de outra organização');
+select is((select count(*) from public.protocol_versions where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê protocol_versions de outra organização');
+select is((select count(*) from public.survey_responses where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê survey_responses de outra organização');
+select is((select count(*) from public.survey_tickets where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê survey_tickets de outra organização');
 reset role;
 
 select * from finish();

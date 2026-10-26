@@ -28,15 +28,17 @@ select is_empty(
 select set_eq(
   $$ select p.proname::text from pg_proc p join pg_namespace n on n.oid = p.pronamespace
      where n.nspname = 'public' and p.prosecdef $$,
-  array['create_organization', 'join_organization_by_domain', 'set_member_role'],
-  'em public, só as RPCs de entrada são security definer'
+  array['create_organization', 'join_organization_by_domain', 'set_member_role',
+        'submit_feedback', 'decide_opportunity', 'decide_diagnosis', 'set_active_protocol_version'],
+  'em public, só as RPCs de entrada, validação e curadoria são security definer'
 );
 select set_eq(
   $$ select p.proname::text from pg_proc p join pg_namespace n on n.oid = p.pronamespace
      where n.nspname = 'private' and p.prosecdef $$,
   array['current_org_id', 'is_member', 'is_supervisor', 'is_platform_admin',
         'handle_new_user', 'handle_user_email_change', 'reject_public_domain',
-        'seed_organization_business'],
+        'seed_organization_business',
+        'is_org_manager', 'can_read_evaluation', 'can_edit_evaluation'],
   'funções privilegiadas restantes ficam no schema private'
 );
 
@@ -87,8 +89,9 @@ select ok(not has_table_privilege('authenticated', 'private.public_email_domains
 select set_eq(
   $$ select p.proname::text from pg_proc p join pg_namespace n on n.oid = p.pronamespace
      where n.nspname = 'private' and has_function_privilege('authenticated', p.oid, 'EXECUTE') $$,
-  array['current_org_id', 'is_member', 'is_supervisor', 'is_platform_admin'],
-  'authenticated executa somente as funções de papel em private'
+  array['current_org_id', 'is_member', 'is_supervisor', 'is_platform_admin',
+        'is_org_manager', 'can_read_evaluation', 'can_edit_evaluation'],
+  'authenticated executa somente as funções de papel e de acesso em private'
 );
 
 select * from finish();
