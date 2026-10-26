@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head><meta charset="utf-8"><title>Confirmar cadastro</title></head>
+  <body>
+    <h1>Confirme seu cadastro</h1>
+    <p>Para acessar o Protocolo CX, confirme seu endereço de e-mail.</p>
+    <p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=email">Confirmar cadastro</a></p>
+    <p>Se você não solicitou este cadastro, ignore esta mensagem.</p>
+  </body>
+</html>
