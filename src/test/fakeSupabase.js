@@ -15,6 +15,7 @@ export function createFakeSupabase({ session = null, tables = {} } = {}) {
       signInWithOAuth: vi.fn(async () => ({ data: {}, error: null })),
       signUp: vi.fn(async () => ({ data: {}, error: null })),
       resetPasswordForEmail: vi.fn(async () => ({ data: {}, error: null })),
+      verifyOtp: vi.fn(async () => ({ data: {}, error: null })),
       updateUser: vi.fn(async () => ({ data: {}, error: null })),
       signOut: vi.fn(async () => ({ error: null })),
     },

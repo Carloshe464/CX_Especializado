@@ -25,6 +25,7 @@ const publicRoutes = [
   ['/register', 'Criar conta'],
   ['/forgot-password', 'Esqueci minha senha'],
   ['/reset-password', 'Redefinir senha'],
+  ['/auth/confirm', 'Confirmar acesso'],
   ['/pesquisa/token-ficticio', 'Pesquisa de satisfação'],
   ['/rota-inexistente', 'Página não encontrada'],
 ]
