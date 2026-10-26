@@ -18,7 +18,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 | TASK-015 | Auth por `token_hash` + senha 8; inventário remoto; 4 migrações aplicadas no Supabase real (canal A) | 2 | Operador (Codex) + revisão do orquestrador | 010–014 ✅ | `task/015-supabase-remoto` | ✅ PR #23 |
 | TASK-030 | Base da Fase 4: "Sair" no celular, páginas sob demanda, massa de dados local (`scripts/seed-local.mjs`) | 4 | Operador | TASK-015 ✅ · paralela à 031 | `task/030-base-fase4` | ✅ PR #26 |
 | TASK-031 | Tela Avaliações (`/avaliacoes`) | 4 | Operador | TASK-015 ✅ · paralela à 030 | `task/031-avaliacoes` | ✅ PR #25 |
-| TASK-032 | Tela Nova avaliação (`/nova-avaliacao`): analista travado/escolha pelo supervisor, abas, prints no Storage, protocolo duplicado | 4 | Operador | TASK-030 ✅ · TASK-031 ✅ | `task/032-nova-avaliacao` | 📝 Ordem pronta |
+| TASK-032 | Tela Nova avaliação (`/nova-avaliacao`): analista travado/escolha pelo supervisor, abas, prints no Storage, protocolo duplicado | 4 | Operador | TASK-030 ✅ · TASK-031 ✅ | `task/032-nova-avaliacao` | ✅ PR #30 |
 | TASK-020…025 | Motor de IA + configuração de provedor | 3 | Operador | Fase 2 + escolha do primeiro adaptador de provedor | — | 💤 |
 | TASK-040…044 | Extensão de captura | E | Operador | Fase 4 + exemplo de URL/DOM do ClickDesk | — | 💤 |
 
@@ -33,8 +33,8 @@ Status só muda com evidência (PR, CI, relatório do operador).
 4. ✅ TASK-015: migrações aplicadas no Supabase real (`ymsyabgztkfhdllbxfyc`) em 26/10/2026.
 
 ## Ordem de execução da Fase 4
-1. ✅ TASK-030 (base) · ✅ TASK-031 (Avaliações).
-2. **Agora:** TASK-032 Nova avaliação → TASK-033 Detalhe com validação do analista → TASK-034 Curadoria → TASK-035 Meu desenvolvimento.
+1. ✅ TASK-030 (base) · ✅ TASK-031 (Avaliações) · ✅ TASK-032 (Nova avaliação).
+2. **Agora:** TASK-033 Detalhe com validação do analista → TASK-034 Curadoria → TASK-035 Meu desenvolvimento.
 3. Sem IA (Fase 3 no final): telas de análise são construídas e testadas com análises fictícias da massa local.
 
 ## Backlog identificado em revisões
@@ -51,7 +51,9 @@ Status só muda com evidência (PR, CI, relatório do operador).
 - Gestão de membros: o trigger `protect_evaluation` lê `memberships` com a RLS de quem chama; revisar se a política de `memberships` mudar.
 - Avaliação com execução, ticket de pesquisa ou arquivo não pode ser apagada (FKs da TASK-011); para rascunho com arquivo, a UI (Fase 4) apaga antes o objeto pela API de Storage (comportamento comprovado na TASK-013).
 - Job de limpeza de órfãos: precisa de função privilegiada própria (a view `private.orphan_evaluation_files` não é legível nem pelo `service_role`) (origem: revisão da TASK-013).
-- Fase 4 (upload): mensagem para arquivo de 0 byte (rejeitado pelo check) e `contentType` deduzido pela extensão quando `file.type` vier vazio.
+- ~~Fase 4 (upload): arquivo de 0 byte e `contentType` pela extensão~~ — feito na TASK-032.
+- `findEvaluationIdByProtocol` usa `%termo%`; trocar pelo termo exato escapado (o PostgREST também trata `*` como curinga), para o link da duplicata não sumir com protocolos curtos acima do `max-rows`; unir os dois imports de `lib/cx.js` em `evaluations.js` (origem: revisão da TASK-032).
+- Capturas de tela dos operadores ficam só no computador local; definir como anexá-las ao PR (origem: revisões das TASK-031/032).
 - SEC-21 (LGPD): rever a exclusão de arquivos pelo gestor após a análise junto da política de retenção.
 
 ## Bloqueios e pendências do responsável
@@ -64,6 +66,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 ## Registro de revisões
 | Tarefa | PR | Commit revisado | Resultado | Evidência |
 |---|---|---|---|---|
+| TASK-032 | #30 | `92c2262` | ✅ Aprovada: payload só com as 8 colunas concedidas; analista travado/escolha pelo supervisor (D-013); duplicidade sem perder o texto (D-012); anexos no caminho D-025; desvio temporário (criação só com prints) aceito; P-11/P-12 🟨 | saídas locais (lint 0, 433 testes, build), manual local com supervisor/A/B e 2 linhas em `evaluation_files` |
 | TASK-031 | #25 | `0f3193a` | ✅ Aprovada (2ª rodada): limiar CSAT por organização (`getCsatThresholds()` → mapa; inválido → 4); `organizationId` exposto; exceção em `routes.test.jsx` aceita; P-08 🟨 até a importação (Fase 5) | saídas locais (lint 0, 391 testes, build com chunk `Evaluations` 16,76 kB), teste de regressão com 3 organizações, teste manual local com 2 perfis |
 | TASK-031 | #25 | `6556090` | 🔧 Correção pedida: `getCsatThreshold().maybeSingle()` quebra para o admin da plataforma (lê `app_settings` de várias organizações); limiar deve ser por organização da avaliação; merge da `main` (lazy) | revisão do diff + política `app_settings_select` |
 | TASK-030 | #26 | `747fa8a` | ✅ Aprovada; grupo de chunk `supabase` no Vite aceito (build 300 kB + 214 kB, sem aviso); pgTAP em stack isolado aceito | saídas locais (lint 0, 355 testes, build, 659 pgTAP), seed com guarda (18 casos), reexecução sem duplicar, cobertura por SELECT, teste em 375 px |
