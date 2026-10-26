@@ -313,9 +313,9 @@ update public.evaluations set transcript = 'Texto sintético', updated_at = '200
 select ok((select updated_at from public.evaluations where id = '00000000-0000-4000-8000-000000000100') = now(), 'updated_at é mantido pelo trigger estrutural da TASK-010');
 
 -- As políticas de negócio chegaram na TASK-012 (04_rls_negocio.test.sql). Aqui fica só o
--- que continua valendo: evaluation_files sem políticas (TASK-013) e isolamento da organização.
+-- que continua valendo: leitura de evaluation_files pela TASK-013 e isolamento da organização.
 select is_empty($$ select c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relkind in ('r','p') and not c.relrowsecurity $$, 'SEC-16: todas as tabelas public têm RLS');
-select is_empty($$ select pol.polname from pg_policy pol join pg_class c on c.oid = pol.polrelid where c.relnamespace = 'public'::regnamespace and c.relname = 'evaluation_files' $$, 'evaluation_files segue sem política RLS até a TASK-013');
+select is((select count(*)::int from pg_policy where polrelid = 'public.evaluation_files'::regclass and polcmd = 'r'), 1, 'evaluation_files tem política de leitura da TASK-013');
 select is_empty($$ select c.relname || ':' || privilege from pg_class c cross join unnest(array['SELECT','INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER']) privilege where c.relnamespace = 'public'::regnamespace and c.relkind in ('r','p') and has_table_privilege('anon', c.oid, privilege) $$, 'SEC-10: anon sem qualquer privilégio em tabelas public');
 select is_empty($$ select p.proname from pg_proc p where p.pronamespace = 'private'::regnamespace and p.proname in ('protect_analysis_run','protect_curation_log','check_survey_response_org','seed_organization_business') and (has_function_privilege('anon',p.oid,'EXECUTE') or has_function_privilege('authenticated',p.oid,'EXECUTE')) $$, 'funções estruturais novas não são executáveis pelos papéis da API');
 select ok((select count(*) > 0 from public.ai_failures), 'ai_failures: existem dados para provar a negação de leitura');
@@ -342,7 +342,7 @@ select is((select count(*) from public.analysis_runs where organization_id <> '0
 select is((select count(*) from public.app_settings where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê app_settings de outra organização');
 select is((select count(*) from public.csat_records where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê csat_records de outra organização');
 select is((select count(*) from public.curation_logs where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê curation_logs de outra organização');
-select is((select count(*) from public.evaluation_files), 0::bigint, 'authenticated supervisor não lê evaluation_files sem políticas (TASK-013)');
+select is((select count(*) from public.evaluation_files where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê evaluation_files de outra organização');
 select is((select count(*) from public.evaluation_scores where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê evaluation_scores de outra organização');
 select is((select count(*) from public.evaluations where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê evaluations de outra organização');
 select is((select count(*) from public.opportunities where organization_id <> '00000000-0000-4000-8000-000000000001'), 0::bigint, 'supervisor X não lê opportunities de outra organização');
