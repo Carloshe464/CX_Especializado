@@ -49,8 +49,10 @@ describe('Layout', () => {
       expect(within(nav).getAllByRole('link').filter((link) => link.getAttribute('aria-current') === 'page')).toHaveLength(1)
     }
     expect(screen.getByText('analista@exemplo.test')).toHaveClass('truncate')
-    expect(screen.getByText(label)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument()
+    expect(within(screen.getByRole('complementary')).getByText(label)).toBeInTheDocument()
+    expect(within(screen.getByRole('banner')).getByText(label)).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Sair' })).toHaveLength(2)
+    expect(within(screen.getByRole('banner')).queryByText('analista@exemplo.test')).not.toBeInTheDocument()
     expect(within(screen.getByRole('main')).getByRole('heading', { name: 'Avaliações' })).toBeInTheDocument()
   })
 
@@ -70,10 +72,10 @@ describe('Layout', () => {
       .getAllByRole('link').map((link) => link.textContent)).toEqual(anonymous)
   })
 
-  it('Sair chama somente o callback recebido pelo contexto', async () => {
+  it.each(['banner', 'complementary'])('Sair em %s chama somente o callback recebido pelo contexto', async (region) => {
     const onSignOut = vi.fn()
     renderLayout({ user: { email: 'analista@exemplo.test' }, role: 'analista', onSignOut })
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Sair' }))
+    await userEvent.setup().click(within(screen.getByRole(region)).getByRole('button', { name: 'Sair' }))
     expect(onSignOut).toHaveBeenCalledOnce()
     expect(screen.getByText('analista@exemplo.test')).toBeInTheDocument()
   })
