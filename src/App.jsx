@@ -13,6 +13,7 @@ import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 import ForgotPassword from '@/pages/ForgotPassword'
 import ResetPassword from '@/pages/ResetPassword'
+import AuthConfirm from '@/pages/AuthConfirm'
 import Onboarding from '@/pages/Onboarding'
 import Survey from '@/pages/Survey'
 import Dashboard from '@/pages/Dashboard'
@@ -37,6 +38,7 @@ export function AppRoutes() {
       </Route>
       {/* Fica fora de PublicOnlyRoute: o link de recuperação cria uma sessão. */}
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/auth/confirm" element={<AuthConfirm />} />
       <Route path="/pesquisa/:token" element={<Survey />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/onboarding" element={<Onboarding />} />
