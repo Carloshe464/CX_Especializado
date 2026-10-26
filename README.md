@@ -74,4 +74,4 @@ Uma segunda execução informa que a massa já existe e não duplica registros. 
 
 Os testes pgTAP existentes usam contagens globais: execute-os em banco recém-recriado, antes de carregar a massa.
 
-Todas as rotas exibem páginas provisórias. Ainda não há autenticação, banco de dados, migrações SQL ou chamadas ao Supabase remoto. O cliente preparado não recupera nem renova sessões automaticamente; a configuração de autenticação pertence à TASK-014.
+Estado atual: autenticação, empresas, papéis, banco com RLS e Storage estão prontos (Fase 2, aplicados também no projeto Supabase remoto). As telas internas estão sendo construídas na Fase 4; as que ainda não foram entregues mostram "Em construção". Veja `docs/TASKS.md`.
