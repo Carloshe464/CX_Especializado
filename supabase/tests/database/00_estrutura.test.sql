@@ -90,7 +90,7 @@ select set_eq(
   $$ select p.proname::text from pg_proc p join pg_namespace n on n.oid = p.pronamespace
      where n.nspname = 'private' and has_function_privilege('authenticated', p.oid, 'EXECUTE') $$,
   array['current_org_id', 'is_member', 'is_supervisor', 'is_platform_admin',
-        'is_org_manager', 'can_read_evaluation', 'can_edit_evaluation'],
+        'is_org_manager', 'can_read_evaluation', 'can_edit_evaluation', 'storage_eval_id'],
   'authenticated executa somente as funções de papel e de acesso em private'
 );
 

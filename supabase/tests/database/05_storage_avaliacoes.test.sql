@@ -1,7 +1,7 @@
 -- TASK-013 — Storage privado, políticas por persona, registro e órfãos.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(96);
+select plan(97);
 
 -- Dados sintéticos; SQL em storage.objects só simula a API nesta transação.
 -- Em produção, a remoção dos bytes deve sempre usar a API de Storage.
@@ -124,6 +124,11 @@ select is((select kind from public.evaluation_files where storage_path='a1300000
 select results_eq($$ select organization_id,evaluation_id,kind,mime_type,size_bytes,created_by from public.evaluation_files where storage_path='a1300000-0000-4000-8000-000000000007/a1300000-0000-4000-8000-000000000009/a1300000-0000-4000-8000-000000000017.png' $$, $$ values ('a1300000-0000-4000-8000-000000000007'::uuid,'a1300000-0000-4000-8000-000000000009'::uuid,'print'::text,'image/png'::text,68::bigint,'a1300000-0000-4000-8000-000000000003'::uuid) $$, 'PNG registra tenant, avaliação, MIME, tamanho e owner');
 
 -- DELETE, transição de status e exclusão ordenada do rascunho (§8b).
+reset role;
+select throws_ok('delete from storage.objects where false', '42501', null, 'guard nativo impede DELETE SQL fora da API');
+-- Só nesta transação sintética: simula o contexto que a API de Storage usa.
+-- O guard nativo não é alterado nem desabilitado na migração.
+set local storage.allow_delete_query = 'true';
 reset role; select pg_temp.login('a1300000-0000-4000-8000-000000000004');
 select is_empty($$ delete from storage.objects where bucket_id='evaluation-files' and name='a1300000-0000-4000-8000-000000000007/a1300000-0000-4000-8000-000000000009/a1300000-0000-4000-8000-000000000017.png' returning id $$, 'B não apaga objeto de A');
 reset role; select pg_temp.login('a1300000-0000-4000-8000-000000000003');
