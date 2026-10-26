@@ -15,7 +15,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 | TASK-014 | Auth no frontend: e-mail/senha + Google, ProtectedRoute, redirecionamentos por papel, onboarding | 2 | Operador | TASK-003 ✅ + **TASK-010 mesclada** · paralela à 011 | `claude/magical-hamilton-06itj1` | ✅ PR #15 |
 | TASK-012 | Banco local: RLS de negócio, RPCs de validação/curadoria, `effective_feedback` | 2 | Operador | **TASK-011 mesclada** · paralela à 014 | `laikc/great-mayer-la33ql` | ✅ PR #18 |
 | TASK-013 | Storage privado + `evaluation_files` + serviço de upload/URL assinada | 2 | Operador | **TASK-012 mesclada** | `task/013-storage` | ✅ PR #20 |
-| TASK-015 | Revisão de segurança da Fase 2 + pedido de autorização para o remoto | 2 | Orquestrador | 011–014 mescladas ✅ | — | 📝 próxima |
+| TASK-015 | Auth por `token_hash` + senha 8; inventário remoto somente leitura; aplicação no Supabase real só com autorização (3 etapas com portões) | 2 | Operador (Codex, conector Supabase) + revisão do orquestrador | 010–014 mescladas ✅ | `task/015-supabase-remoto` | 📝 liberada (etapas 1–2) |
 | TASK-020…025 | Motor de IA + configuração de provedor | 3 | Operador | Fase 2 + escolha do primeiro adaptador de provedor | — | 💤 |
 | TASK-040…044 | Extensão de captura | E | Operador | Fase 4 + exemplo de URL/DOM do ClickDesk | — | 💤 |
 
@@ -27,7 +27,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 1. ✅ TASK-003 e TASK-010 (paralelas); ✅ TASK-011 e TASK-014 (paralelas).
 2. ✅ TASK-012 (RLS/RPCs de negócio).
 3. ✅ TASK-013 (Storage).
-4. **Agora — TASK-015:** revisão de segurança pelo orquestrador + pedido de autorização para aplicar no remoto.
+4. **Agora — TASK-015:** etapas 1–2 (correções locais + inventário remoto só leitura) → revisão do orquestrador → autorização escrita do responsável → etapa 3 (aplicação e verificação remota).
 
 ## Backlog identificado em revisões
 - Gestão de membros: inclusão ou convite pelo admin/supervisor, para empresas sem domínio, e promoção/remoção pela interface (origem: revisão da TASK-010).
