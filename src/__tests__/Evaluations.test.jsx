@@ -17,13 +17,13 @@ const rows = [
   { id: 'b', protocol: 'CX-002', analyst_name: 'Lívia Exemplo', channel: 'WhatsApp', status: 'transcrito', current_run: { trend: 'Incerta' } },
   { id: 'c', protocol: 'CX-003', analyst_name: 'José Teste', channel: 'Telefone', status: 'analisado', current_run: { trend: 'Favorável' } },
   { id: 'd', protocol: null, analyst_name: null, channel: null, status: 'curado', current_run: { trend: 'Desfavorável' } },
-].map((row, i) => ({ ...row, created_at: '2026-10-26T12:00:00Z', csat_records: i < 3 ? [{ score: [5, 3, 4][i], created_at: '2026-10-26T12:00:00Z' }] : [] }))
+].map((row, i) => ({ ...row, organization_id: 'org-a', created_at: '2026-10-26T12:00:00Z', csat_records: i < 3 ? [{ score: [5, 3, 4][i], created_at: '2026-10-26T12:00:00Z' }] : [] }))
 
 let queryClient
 beforeEach(() => {
   mocks.client = createFakeSupabase({ tables: {
     evaluations: { data: rows, error: null },
-    app_settings: { data: { value: '4' }, error: null },
+    app_settings: { data: [{ organization_id: 'org-a', value: '4' }], error: null },
   } })
   queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: Infinity } } })
 })
@@ -62,14 +62,30 @@ it('exibe os quatro status, tendências, notas e links corretos', async () => {
   expect(screen.getByRole('button', { name: 'Importar planilha' })).toHaveAccessibleDescription('Disponível em breve')
   expect(screen.getByRole('link', { name: 'Nova avaliação' })).toHaveAttribute('href', '/nova-avaliacao')
   expect(screen.queryByText('Mostrando as 200 avaliações mais recentes.')).not.toBeInTheDocument()
-  expect(queryClient.getQueryData(['app_settings', 'csat_positive_threshold'])).toBe(4)
+  expect(queryClient.getQueryData(['app_settings', 'csat_positive_threshold'])).toEqual({ 'org-a': 4 })
   expect(queryClient.getQueryData(['evaluations'])).toHaveLength(4)
 })
 
 it('usa o limiar da organização: nota 4 com limiar 5 é Insatisfação', async () => {
-  mocks.client.tables.app_settings = { data: { value: '5' }, error: null }
+  mocks.client.tables.app_settings = { data: [{ organization_id: 'org-a', value: '5' }], error: null }
   show()
   expect(await screen.findByText('Nota real: 4 · Insatisfação')).toBeInTheDocument()
+})
+
+it('exibe para o admin a nota 4 com a faixa de cada organização, incluindo a sem configuração', async () => {
+  mocks.client.tables.evaluations = { data: ['org-a', 'org-b', 'org-sem-config'].map((organization_id) => ({
+    ...rows[2], id: organization_id, organization_id, protocol: organization_id,
+  })), error: null }
+  mocks.client.tables.app_settings = { data: [
+    { organization_id: 'org-a', value: '4' },
+    { organization_id: 'org-b', value: '5' },
+  ], error: null }
+  show()
+  await screen.findByRole('list', { name: 'Lista de avaliações' })
+  expect(within(screen.getByRole('link', { name: /^org-a / })).getByText('Nota real: 4 · Satisfação positiva')).toBeInTheDocument()
+  expect(within(screen.getByRole('link', { name: /^org-b / })).getByText('Nota real: 4 · Insatisfação')).toBeInTheDocument()
+  expect(within(screen.getByRole('link', { name: /^org-sem-config / })).getByText('Nota real: 4 · Satisfação positiva')).toBeInTheDocument()
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument()
 })
 
 it.each([
@@ -109,7 +125,7 @@ it.each(['evaluations', 'app_settings'])('permite tentar novamente após falha e
   mocks.client.tables[table] = { data: null, error: new Error('Falha fictícia') }
   show()
   expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar as avaliações.')
-  mocks.client.tables[table] = { data: table === 'evaluations' ? rows : { value: '4' }, error: null }
+  mocks.client.tables[table] = { data: table === 'evaluations' ? rows : [{ organization_id: 'org-a', value: '4' }], error: null }
   await user.click(screen.getByRole('button', { name: 'Tentar novamente' }))
   await screen.findByRole('list')
   await waitFor(() => expect(mocks.client.from.mock.calls.filter(([name]) => name === table)).toHaveLength(2))

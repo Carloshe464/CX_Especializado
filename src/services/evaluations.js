@@ -10,7 +10,7 @@ export async function listEvaluations() {
   const { data, error } = await client()
     .from('evaluations')
     .select(`
-      id, protocol, analyst_name, channel, status, created_at,
+      id, organization_id, protocol, analyst_name, channel, status, created_at,
       current_run:analysis_runs!evaluations_current_run_fkey(trend),
       csat_records(score, created_at)
     `)
@@ -24,6 +24,7 @@ export async function listEvaluations() {
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0]
     return {
       id: row.id,
+      organizationId: row.organization_id,
       protocol: row.protocol,
       analystName: row.analyst_name,
       channel: row.channel,
@@ -35,15 +36,16 @@ export async function listEvaluations() {
   })
 }
 
-export async function getCsatThreshold() {
+export async function getCsatThresholds() {
   const { data, error } = await client()
     .from('app_settings')
-    .select('value')
+    .select('organization_id, value')
     .eq('key', 'csat_positive_threshold')
-    .maybeSingle()
   if (error) throw error
-  const threshold = Number(data?.value)
-  return Number.isInteger(threshold) && threshold >= 1 && threshold <= 5
-    ? threshold
-    : DEFAULT_CSAT_THRESHOLD
+  return Object.fromEntries((data ?? []).map(({ organization_id, value }) => {
+    const threshold = Number(value)
+    return [organization_id, Number.isInteger(threshold) && threshold >= 1 && threshold <= 5
+      ? threshold
+      : DEFAULT_CSAT_THRESHOLD]
+  }))
 }
