@@ -7,7 +7,7 @@ Itens **Alterado** seguem a nova regra decidida pelo responsável (não a REF) e
 Status: ⬜ Não iniciado · 🟨 Em andamento · 🟦 Implementado (sem evidência) · ✅ Verificado · ⛔ Bloqueado
 REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 
-**Paridade atual comprovada: 31 / 102 itens (30,4%)**, com TASK-001 (PR #2), TASK-002 (PR #4), TASK-003 (PR #8), TASK-010 (PR #11), TASK-011 (PR #16), TASK-014 (PR #15) e TASK-012 (PR #18) mescladas.
+**Paridade atual comprovada: 32 / 102 itens (31,4%)**, com TASK-001 (PR #2), TASK-002 (PR #4), TASK-003 (PR #8), TASK-010 (PR #11), TASK-011 (PR #16), TASK-014 (PR #15), TASK-012 (PR #18) e TASK-013 (PR #20) mescladas.
 
 ## Fundação e visual
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
@@ -43,11 +43,11 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | S-04 | Veredito de supervisor só por supervisor da organização (API e banco); prevalece sobre o do analista | §4 | Segurança | Corrigido D-007#2 + D-011 | pgTAP `04_rls_negocio` (RPCs `decide_*` só gestor; `effective_feedback` D-024) (PR #18) | ✅ |
 | S-05 | `curation_logs` imutável | §4.6 | Segurança | Corrigido | pgTAP `03_entidades_negocio` (CX021, inclusive como `postgres` e `TRUNCATE`) (PR #16) | ✅ |
 | S-06 | Papel não controlável pelo usuário | — | Segurança | SEC-04 | pgTAP `01_entrada`/`02_acesso` (CX016) (PR #11) + `AuthProvider.test.jsx` ignora metadata (PR #15) | ✅ |
-| S-07 | Storage privado com URLs assinadas 3600 s | §10 | Segurança | Paridade | teste | ⬜ |
+| S-07 | Storage privado com URLs assinadas 3600 s | §10 | Segurança | Paridade | pgTAP `05_storage_avaliacoes` + `evaluationFiles.test.js` + teste real local (URL assinada 200; sem token 400; TTL 3600) (PR #20) | ✅ |
 | S-08 | Sem acesso `anon` a tabelas internas | §4.5 | Segurança | Corrigido | pgTAP SEC-10 em `03`/`04` (`anon` sem privilégio em tabelas, view e RPCs) (PR #16, #18) | ✅ |
 | S-09 | Seed `csat_positive_threshold=4` e `ProtocolVersion V1.1` | §11.7 | Funcional | Paridade | pgTAP `03_entidades_negocio` (limiar 4; V1.1 inativa e V1.2 ativa, D-019) (PR #16) | ✅ |
 | S-10 | Protocolo único sob concorrência | — | Integridade | D-012 | teste concorrente | ⬜ |
-| S-11 | Arquivos sem órfãos | — | Integridade | D-007#9 | teste | ⬜ |
+| S-11 | Arquivos sem órfãos | — | Integridade | D-007#9 | teste | 🟨 sincronização por trigger + view de órfãos (PR #20); job de limpeza no backlog |
 
 ## Domínio (`lib/cx.js`)
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
@@ -144,7 +144,7 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | N-04 | Veredito do supervisor com prioridade | D-011 | specs/VALIDACAO_E_CURADORIA | 🟨 RPCs `decide_*` + `effective_feedback` (PR #18); tela na Fase 4 |
 | N-05 | Taxa de utilidade da IA (individual p/ analista; organização p/ supervisor) | D-011 | specs/VALIDACAO_E_CURADORIA | ⬜ |
 | N-06 | Configuração de provedor/modelo/chave de IA pela interface | D-009 | specs/PROVEDOR_IA | ⬜ |
-| N-07 | Supervisor escolhe analista ao criar avaliação | D-013 | ARCHITECTURE §4 | ⬜ |
+| N-07 | Supervisor escolhe analista ao criar avaliação | D-013 | ARCHITECTURE §4 | 🟨 política de INSERT de `evaluations` (PR #18); tela na Fase 4 |
 | N-08 | Extensão de captura com salvamento automático em `.txt` | D-018 | specs/EXTENSAO_CAPTURA | ⬜ |
 | N-09 | "Analisar ao vivo" na extensão | D-018 | specs/EXTENSAO_CAPTURA | ⬜ |
 | N-10 | Ingestão por número do ticket (URL) | D-018, D-012 | specs/EXTENSAO_CAPTURA | ⬜ |
