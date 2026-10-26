@@ -17,7 +17,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 | TASK-013 | Storage privado + `evaluation_files` + serviço de upload/URL assinada | 2 | Operador | **TASK-012 mesclada** | `task/013-storage` | ✅ PR #20 |
 | TASK-015 | Auth por `token_hash` + senha 8; inventário remoto; 4 migrações aplicadas no Supabase real (canal A) | 2 | Operador (Codex) + revisão do orquestrador | 010–014 ✅ | `task/015-supabase-remoto` | ✅ PR #23 |
 | TASK-030 | Base da Fase 4: "Sair" no celular, páginas sob demanda, massa de dados local (`scripts/seed-local.mjs`) | 4 | Operador | TASK-015 ✅ · paralela à 031 | `task/030-base-fase4` | ✅ PR #26 |
-| TASK-031 | Tela Avaliações (`/avaliacoes`) | 4 | Operador | TASK-015 ✅ · paralela à 030 | `task/031-avaliacoes` | 🔧 PR #25 — correção pedida (limiar por organização para o admin) |
+| TASK-031 | Tela Avaliações (`/avaliacoes`) | 4 | Operador | TASK-015 ✅ · paralela à 030 | `task/031-avaliacoes` | ✅ PR #25 |
 | TASK-020…025 | Motor de IA + configuração de provedor | 3 | Operador | Fase 2 + escolha do primeiro adaptador de provedor | — | 💤 |
 | TASK-040…044 | Extensão de captura | E | Operador | Fase 4 + exemplo de URL/DOM do ClickDesk | — | 💤 |
 
@@ -32,8 +32,8 @@ Status só muda com evidência (PR, CI, relatório do operador).
 4. ✅ TASK-015: migrações aplicadas no Supabase real (`ymsyabgztkfhdllbxfyc`) em 26/10/2026.
 
 ## Ordem de execução da Fase 4
-1. ✅ TASK-030 (base). **Agora:** correção da TASK-031 (Avaliações).
-2. TASK-032 Nova avaliação → TASK-033 Detalhe com validação do analista → TASK-034 Curadoria → TASK-035 Meu desenvolvimento.
+1. ✅ TASK-030 (base) · ✅ TASK-031 (Avaliações).
+2. **Agora:** TASK-032 Nova avaliação → TASK-033 Detalhe com validação do analista → TASK-034 Curadoria → TASK-035 Meu desenvolvimento.
 3. Sem IA (Fase 3 no final): telas de análise são construídas e testadas com análises fictícias da massa local.
 
 ## Backlog identificado em revisões
@@ -42,8 +42,9 @@ Status só muda com evidência (PR, CI, relatório do operador).
 - ~~`minimum_password_length = 8` no `config.toml` local~~ — feito na TASK-015.
 - Templates `token_hash` prontos no repositório (TASK-015), mas **bloqueados no remoto**: projeto Free com SMTP padrão não permite editar templates e só envia para a equipe (2/h). **SMTP próprio é pré-requisito da publicação** — decisão do responsável.
 - Painel de Auth remoto (responsável): senha mínima 8; Site URL e redirects `http://localhost:5173` (provisórios até a Fase 6).
-- Botão "Sair" no cabeçalho móvel do `Layout` (hoje só existe na barra lateral do desktop) — correção pequena, junto da Fase 4.
-- *Code splitting* das páginas internas (bundle de 512 kB) — Fase 4.
+- ~~Botão "Sair" no cabeçalho móvel do `Layout`~~ — feito na TASK-030.
+- ~~*Code splitting* das páginas internas (bundle de 512 kB)~~ — feito na TASK-030.
+- Teste intermitente: `AuthConfirm.test.jsx` ("confirma email e substitui a URL por /") deu timeout uma vez na suíte completa e passou isolado e na reexecução; estabilizar sem aumentar timeout (origem: revisão da TASK-031).
 - Fase 3: a Edge Function só aponta `current_analysis_run_id` para execução com `sucesso` (`decide_opportunity` confere só a execução atual) (origem: revisão da TASK-012).
 - TASK-021: a tela de configuração de IA lista colunas explicitamente; `select *` em `ai_provider_configs` dá `42501` (sem grant em `secret_ref`).
 - Gestão de membros: o trigger `protect_evaluation` lê `memberships` com a RLS de quem chama; revisar se a política de `memberships` mudar.
@@ -62,6 +63,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 ## Registro de revisões
 | Tarefa | PR | Commit revisado | Resultado | Evidência |
 |---|---|---|---|---|
+| TASK-031 | #25 | `0f3193a` | ✅ Aprovada (2ª rodada): limiar CSAT por organização (`getCsatThresholds()` → mapa; inválido → 4); `organizationId` exposto; exceção em `routes.test.jsx` aceita; P-08 🟨 até a importação (Fase 5) | saídas locais (lint 0, 391 testes, build com chunk `Evaluations` 16,76 kB), teste de regressão com 3 organizações, teste manual local com 2 perfis |
 | TASK-031 | #25 | `6556090` | 🔧 Correção pedida: `getCsatThreshold().maybeSingle()` quebra para o admin da plataforma (lê `app_settings` de várias organizações); limiar deve ser por organização da avaliação; merge da `main` (lazy) | revisão do diff + política `app_settings_select` |
 | TASK-030 | #26 | `747fa8a` | ✅ Aprovada; grupo de chunk `supabase` no Vite aceito (build 300 kB + 214 kB, sem aviso); pgTAP em stack isolado aceito | saídas locais (lint 0, 355 testes, build, 659 pgTAP), seed com guarda (18 casos), reexecução sem duplicar, cobertura por SELECT, teste em 375 px |
 | TASK-015 | #23 | `736e6e0` | ✅ Aprovada; portões cumpridos (aprovação condicionada + inventário; autorização escrita, canal A); 4 migrações aplicadas com versões iguais às locais; 7 WARN `authenticated_security_definer_function_executable` aceitos (RPCs previstas, `anon` revogado, papel validado internamente) | saídas de `db push --dry-run`/`db push`; verificação somente leitura SEC-09/10/11/15/16/19; hashes das 27 funções e 33 políticas iguais ao local |
