@@ -12,14 +12,14 @@ const ROLE_LABELS = {
 
 function Brand({ small = false }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className={small ? 'flex min-w-0 items-center gap-2' : 'flex items-center gap-3'}>
       <div className={small
         ? 'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground'
         : 'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground'}>
         <HeartHandshake className={small ? 'h-5 w-5' : 'h-6 w-6'} aria-hidden="true" />
       </div>
       {/* Nome derivado — confirmar na comparação visual. */}
-      <span className="font-heading text-lg font-semibold">Protocolo CX</span>
+      <span className={small ? 'whitespace-nowrap font-heading text-base font-semibold' : 'font-heading text-lg font-semibold'}>Protocolo CX</span>
     </div>
   )
 }
@@ -56,7 +56,17 @@ export default function Layout() {
       </aside>
 
       <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur lg:hidden">
-        <div className="px-4 py-3"><Brand small /></div>
+        <div className="flex items-center justify-between gap-2 px-4 py-3">
+          <Brand small />
+          {user && (
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="whitespace-nowrap text-[11px] uppercase tracking-widest text-muted-foreground">{ROLE_LABELS[role]}</span>
+              <Button variant="ghost" size="sm" className="gap-1 px-2" aria-label="Sair" onClick={onSignOut}>
+                <LogOut className="h-4 w-4" aria-hidden="true" />Sair
+              </Button>
+            </div>
+          )}
+        </div>
         <nav aria-label="Navegação principal (celular)" className="overflow-x-auto px-4 pb-3">
           <div className="flex w-max gap-2">
             {items.map(({ label, to, icon: Icon }) => (
