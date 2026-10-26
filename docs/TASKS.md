@@ -16,8 +16,8 @@ Status só muda com evidência (PR, CI, relatório do operador).
 | TASK-012 | Banco local: RLS de negócio, RPCs de validação/curadoria, `effective_feedback` | 2 | Operador | **TASK-011 mesclada** · paralela à 014 | `laikc/great-mayer-la33ql` | ✅ PR #18 |
 | TASK-013 | Storage privado + `evaluation_files` + serviço de upload/URL assinada | 2 | Operador | **TASK-012 mesclada** | `task/013-storage` | ✅ PR #20 |
 | TASK-015 | Auth por `token_hash` + senha 8; inventário remoto; 4 migrações aplicadas no Supabase real (canal A) | 2 | Operador (Codex) + revisão do orquestrador | 010–014 ✅ | `task/015-supabase-remoto` | ✅ PR #23 |
-| TASK-030 | Base da Fase 4: "Sair" no celular, páginas sob demanda, massa de dados local (`scripts/seed-local.mjs`) | 4 | Operador | TASK-015 ✅ · paralela à 031 | `task/030-base-fase4` | 📝 liberada |
-| TASK-031 | Tela Avaliações (`/avaliacoes`) | 4 | Operador | TASK-015 ✅ · paralela à 030 | `task/031-avaliacoes` | 📝 liberada |
+| TASK-030 | Base da Fase 4: "Sair" no celular, páginas sob demanda, massa de dados local (`scripts/seed-local.mjs`) | 4 | Operador | TASK-015 ✅ · paralela à 031 | `task/030-base-fase4` | ✅ PR #26 |
+| TASK-031 | Tela Avaliações (`/avaliacoes`) | 4 | Operador | TASK-015 ✅ · paralela à 030 | `task/031-avaliacoes` | 🔧 PR #25 — correção pedida (limiar por organização para o admin) |
 | TASK-020…025 | Motor de IA + configuração de provedor | 3 | Operador | Fase 2 + escolha do primeiro adaptador de provedor | — | 💤 |
 | TASK-040…044 | Extensão de captura | E | Operador | Fase 4 + exemplo de URL/DOM do ClickDesk | — | 💤 |
 
@@ -32,7 +32,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 4. ✅ TASK-015: migrações aplicadas no Supabase real (`ymsyabgztkfhdllbxfyc`) em 26/10/2026.
 
 ## Ordem de execução da Fase 4
-1. **Agora (paralelo):** TASK-030 (base) e TASK-031 (Avaliações).
+1. ✅ TASK-030 (base). **Agora:** correção da TASK-031 (Avaliações).
 2. TASK-032 Nova avaliação → TASK-033 Detalhe com validação do analista → TASK-034 Curadoria → TASK-035 Meu desenvolvimento.
 3. Sem IA (Fase 3 no final): telas de análise são construídas e testadas com análises fictícias da massa local.
 
@@ -62,6 +62,8 @@ Status só muda com evidência (PR, CI, relatório do operador).
 ## Registro de revisões
 | Tarefa | PR | Commit revisado | Resultado | Evidência |
 |---|---|---|---|---|
+| TASK-031 | #25 | `6556090` | 🔧 Correção pedida: `getCsatThreshold().maybeSingle()` quebra para o admin da plataforma (lê `app_settings` de várias organizações); limiar deve ser por organização da avaliação; merge da `main` (lazy) | revisão do diff + política `app_settings_select` |
+| TASK-030 | #26 | `747fa8a` | ✅ Aprovada; grupo de chunk `supabase` no Vite aceito (build 300 kB + 214 kB, sem aviso); pgTAP em stack isolado aceito | saídas locais (lint 0, 355 testes, build, 659 pgTAP), seed com guarda (18 casos), reexecução sem duplicar, cobertura por SELECT, teste em 375 px |
 | TASK-015 | #23 | `736e6e0` | ✅ Aprovada; portões cumpridos (aprovação condicionada + inventário; autorização escrita, canal A); 4 migrações aplicadas com versões iguais às locais; 7 WARN `authenticated_security_definer_function_executable` aceitos (RPCs previstas, `anon` revogado, papel validado internamente) | saídas de `db push --dry-run`/`db push`; verificação somente leitura SEC-09/10/11/15/16/19; hashes das 27 funções e 33 políticas iguais ao local |
 | TASK-013 | #20 | `d0e93b1` | ✅ Aprovada; CX037–CX038; teste usa `storage.allow_delete_query` só na transação sintética (aceito); §8b comprovado | saídas locais (659/659 pgTAP, `db lint`, `db advisors` security, lint 0, 324 testes, build) e teste real no navegador (URL assinada 200, sem token 400, TTL 3600) |
 | TASK-012 | #18 | `6817194` | ✅ Aprovada; códigos CX023–CX036; políticas de `evaluations` em linha (INSERT … RETURNING) e regras extras aceitas; relatório diz que `decide_opportunity` exige `sucesso`, o código só exige execução atual (risco nulo, registrado para a Fase 3) | saídas locais (562/562 pgTAP, `db lint`, lint 0, 301 testes, build); revisão linha a linha da migração e da matriz |

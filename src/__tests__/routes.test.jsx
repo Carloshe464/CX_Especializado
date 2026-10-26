@@ -48,8 +48,9 @@ describe('rotas internas', () => {
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
   })
 
-  it.each(internal)('%s renderiza %s dentro do layout para supervisor', (path, title) => {
+  it.each(internal)('%s renderiza %s dentro do layout para supervisor', async (path, title) => {
     renderAt(path, supervisor)
+    expect(await screen.findByRole('heading', { level: 1, name: title })).toBeInTheDocument()
     expect(within(screen.getByRole('main')).getByRole('heading', { level: 1, name: title })).toBeInTheDocument()
     if (path === '/avaliacoes') {
       expect(screen.getByRole('searchbox', { name: 'Buscar avaliações' })).toBeInTheDocument()
@@ -61,15 +62,15 @@ describe('rotas internas', () => {
 })
 
 describe('rotas públicas', () => {
-  it.each(publicRoutes)('%s renderiza %s sem sessão e sem o menu interno', (path, title) => {
+  it.each(publicRoutes)('%s renderiza %s sem sessão e sem o menu interno', async (path, title) => {
     renderAt(path)
-    expect(screen.getByRole('heading', { level: 1, name: title })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: title })).toBeInTheDocument()
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
   })
 
-  it('/pesquisa/:token continua pública mesmo com sessão', () => {
+  it('/pesquisa/:token continua pública mesmo com sessão', async () => {
     renderAt('/pesquisa/token-ficticio', supervisor)
-    expect(screen.getByRole('heading', { level: 1, name: 'Pesquisa de satisfação' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Pesquisa de satisfação' })).toBeInTheDocument()
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
   })
 
@@ -80,6 +81,6 @@ describe('rotas públicas', () => {
     expect(link).toHaveAttribute('href', '/')
     expect(link).toHaveClass('bg-primary')
     await user.click(link)
-    expect(screen.getByRole('heading', { name: 'Painel' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Painel' })).toBeInTheDocument()
   })
 })

@@ -60,4 +60,18 @@ A configuração é opcional nesta fase: sem variáveis, as páginas continuam f
 | `npm run test` | Testes em execução única |
 | `npm run test:watch` | Testes em modo de observação |
 
-Todas as rotas exibem páginas provisórias. Ainda não há autenticação, banco de dados, migrações SQL ou chamadas ao Supabase remoto. O cliente preparado não recupera nem renova sessões automaticamente; a configuração de autenticação pertence à TASK-014.
+## Massa de dados local
+
+Com o Docker e a CLI do Supabase disponíveis:
+
+1. Execute `supabase start` e `supabase db reset --local`.
+2. Consulte `supabase status` e defina `SUPABASE_SECRET_KEY` **somente no ambiente do terminal** com a chave secret/service_role local. Não grave a chave em arquivos nem compartilhe a saída do status. A chave do servidor nunca deve usar prefixo `VITE_`.
+3. Execute `node scripts/seed-local.mjs`. O destino padrão é `http://127.0.0.1:54321`; `SUPABASE_URL` ou `--url` permitem escolher outro endereço **local**.
+
+O script recusa qualquer host diferente de `127.0.0.1` ou `localhost`, inclusive projetos remotos, e não segue redirecionamentos HTTP. Cria duas empresas e cinco usuários fictícios, com avaliações, análises, validações, curadoria e CSAT. Mostra os e-mails, papéis, contagens e a senha fixa de teste ao terminar.
+
+Uma segunda execução informa que a massa já existe e não duplica registros. `--reset` apenas mostra a instrução `supabase db reset`; não apaga dados. Se uma execução falhar no meio, use o reset local para recomeçar. Depois do teste, execute `supabase stop` e remova a variável `SUPABASE_SECRET_KEY` do terminal.
+
+Os testes pgTAP existentes usam contagens globais: execute-os em banco recém-recriado, antes de carregar a massa.
+
+Estado atual: autenticação, empresas, papéis, banco com RLS e Storage estão prontos (Fase 2, aplicados também no projeto Supabase remoto). As telas internas estão sendo construídas na Fase 4; as que ainda não foram entregues mostram "Em construção". Veja `docs/TASKS.md`.

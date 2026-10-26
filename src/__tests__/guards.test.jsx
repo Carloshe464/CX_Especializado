@@ -73,14 +73,14 @@ function renderApp(path, session) {
 }
 
 describe('RequireRole (redirecionamentos da REF §3)', () => {
-  it('analista em / vai para /meu-desenvolvimento', () => {
+  it('analista em / vai para /meu-desenvolvimento', async () => {
     renderApp('/', member('analista'))
-    expect(screen.getByRole('heading', { level: 1, name: 'Meu desenvolvimento' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Meu desenvolvimento' })).toBeInTheDocument()
   })
 
-  it.each(['/curadoria', '/satisfacao'])('analista em %s vai para / e depois para /meu-desenvolvimento', (path) => {
+  it.each(['/curadoria', '/satisfacao'])('analista em %s vai para / e depois para /meu-desenvolvimento', async (path) => {
     renderApp(path, member('analista'))
-    expect(screen.getByRole('heading', { level: 1, name: 'Meu desenvolvimento' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Meu desenvolvimento' })).toBeInTheDocument()
   })
 
   it.each([
@@ -90,24 +90,24 @@ describe('RequireRole (redirecionamentos da REF §3)', () => {
     ['platform_admin', '/', 'Painel'],
     ['platform_admin', '/curadoria', 'Curadoria'],
     ['platform_admin', '/satisfacao', 'Satisfação'],
-  ])('%s acessa %s', (role, path, title) => {
+  ])('%s acessa %s', async (role, path, title) => {
     renderApp(path, member(role))
-    expect(screen.getByRole('heading', { level: 1, name: title })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: title })).toBeInTheDocument()
   })
 
-  it('nenhum outro redirecionamento: supervisor acessa /meu-desenvolvimento', () => {
+  it('nenhum outro redirecionamento: supervisor acessa /meu-desenvolvimento', async () => {
     renderApp('/meu-desenvolvimento', member('supervisor'))
-    expect(screen.getByRole('heading', { level: 1, name: 'Meu desenvolvimento' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Meu desenvolvimento' })).toBeInTheDocument()
   })
 })
 
 describe('telas de autenticação com sessão ativa', () => {
-  it.each(['/login', '/register', '/forgot-password'])('%s com usuário logado vai para /', (path) => {
+  it.each(['/login', '/register', '/forgot-password'])('%s com usuário logado vai para /', async (path) => {
     renderApp(path, member('supervisor'))
-    expect(screen.getByRole('heading', { level: 1, name: 'Painel' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Painel' })).toBeInTheDocument()
   })
 
-  it('/login com usuário logado volta para a rota de origem', () => {
+  it('/login com usuário logado volta para a rota de origem', async () => {
     render(
       <SessionProvider value={member('supervisor')}>
         <MemoryRouter initialEntries={[{ pathname: '/login', state: { from: { pathname: '/protocolo' } } }]}>
@@ -115,6 +115,6 @@ describe('telas de autenticação com sessão ativa', () => {
         </MemoryRouter>
       </SessionProvider>,
     )
-    expect(screen.getByRole('heading', { level: 1, name: 'Protocolo' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Protocolo' })).toBeInTheDocument()
   })
 })
