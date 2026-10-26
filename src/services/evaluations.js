@@ -1,5 +1,6 @@
 import { supabase, supabaseConfigError } from '../lib/supabaseClient.js'
 import { DEFAULT_CSAT_THRESHOLD } from '../lib/cx.js'
+import { CHANNELS } from '../lib/cx.js'
 
 function client() {
   if (!supabase) throw new Error(supabaseConfigError || 'Configure o Supabase para acessar as avaliações.')
@@ -48,4 +49,45 @@ export async function getCsatThresholds() {
       ? threshold
       : DEFAULT_CSAT_THRESHOLD]
   }))
+}
+
+export function buildEvaluationPayload({ form, session, analyst, hasPrints }) {
+  const own = session.role === 'analista'
+  const hasText = Boolean(form.transcript?.trim())
+  return {
+    organization_id: session.organizationId,
+    protocol: form.protocol?.trim() || null,
+    channel: CHANNELS.includes(form.channel) ? form.channel : null,
+    transcript: hasText ? form.transcript : null,
+    source: hasPrints ? 'prints' : 'texto',
+    status: hasText ? 'transcrito' : 'rascunho',
+    analyst_user_id: own ? session.user.id : analyst.id,
+    analyst_name: own ? session.user.fullName || session.user.email : analyst.name,
+  }
+}
+
+export async function findEvaluationIdByProtocol(protocol, organizationId) {
+  const normalized = protocol.trim().toLowerCase()
+  const pattern = `%${normalized.replace(/[\\%_]/g, '\\$&')}%`
+  let query = client().from('evaluations').select('id, protocol').ilike('protocol', pattern)
+  // O admin pode ler várias organizações; a busca de uma duplicata pertence à criação atual.
+  if (organizationId) query = query.eq('organization_id', organizationId)
+  const { data, error } = await query
+  if (error) throw error
+  return (data ?? []).find((row) => row.protocol?.trim().toLowerCase() === normalized)?.id ?? null
+}
+
+export async function createEvaluation(payload) {
+  const { data, error } = await client().from('evaluations')
+    .insert(payload).select('id, organization_id').single()
+  if (error?.code === '23505') {
+    const duplicate = new Error('Já existe uma avaliação com este protocolo.')
+    duplicate.code = 'PROTOCOLO_DUPLICADO'
+    duplicate.existingId = payload.protocol
+      ? await findEvaluationIdByProtocol(payload.protocol, payload.organization_id)
+      : null
+    throw duplicate
+  }
+  if (error) throw error
+  return { id: data.id, organizationId: data.organization_id }
 }

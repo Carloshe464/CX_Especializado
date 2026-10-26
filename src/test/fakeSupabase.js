@@ -22,6 +22,10 @@ export function createFakeSupabase({ session = null, tables = {} } = {}) {
     from: vi.fn((table) => {
       const query = {
         select: vi.fn(() => query),
+        insert: vi.fn(() => query),
+        single: vi.fn(async () => tables[table] ?? { data: null, error: null }),
+        in: vi.fn(() => query),
+        ilike: vi.fn(() => query),
         eq: vi.fn(() => query),
         order: vi.fn(() => query),
         limit: vi.fn(() => query),

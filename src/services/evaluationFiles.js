@@ -2,6 +2,11 @@ import { supabase, supabaseConfigError } from '../lib/supabaseClient.js'
 
 const BUCKET = 'evaluation-files'
 const EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'webp', 'pdf', 'txt', 'csv', 'xlsx'])
+const MIME_TYPES = {
+  png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp',
+  pdf: 'application/pdf', txt: 'text/plain', csv: 'text/csv',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+}
 
 function storage() {
   if (!supabase) throw new Error(supabaseConfigError || 'Configure o Supabase para acessar os arquivos das avaliações.')
@@ -17,9 +22,11 @@ export function buildEvaluationFilePath({ organizationId, evaluationId, fileName
 }
 
 export async function uploadEvaluationFile({ organizationId, evaluationId, file }) {
+  if (file.size === 0) throw new Error(`O arquivo ${file.name} está vazio.`)
   const bucket = storage()
   const path = buildEvaluationFilePath({ organizationId, evaluationId, fileName: file.name })
-  const { data, error } = await bucket.upload(path, file, { upsert: false, contentType: file.type })
+  const contentType = file.type || MIME_TYPES[file.name.split('.').pop().toLowerCase()]
+  const { data, error } = await bucket.upload(path, file, { upsert: false, contentType })
   if (error) throw error
   return data
 }
