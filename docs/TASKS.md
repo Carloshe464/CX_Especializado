@@ -19,6 +19,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 | TASK-030 | Base da Fase 4: "Sair" no celular, páginas sob demanda, massa de dados local (`scripts/seed-local.mjs`) | 4 | Operador | TASK-015 ✅ · paralela à 031 | `task/030-base-fase4` | ✅ PR #26 |
 | TASK-031 | Tela Avaliações (`/avaliacoes`) | 4 | Operador | TASK-015 ✅ · paralela à 030 | `task/031-avaliacoes` | ✅ PR #25 |
 | TASK-032 | Tela Nova avaliação (`/nova-avaliacao`): analista travado/escolha pelo supervisor, abas, prints no Storage, protocolo duplicado | 4 | Operador | TASK-030 ✅ · TASK-031 ✅ | `task/032-nova-avaliacao` | ✅ PR #30 |
+| TASK-033 | Detalhe da avaliação (`/avaliacao/:id`): execução atual, anexos, transcrição editável, validação do analista (`submit_feedback`), curadoria em só leitura | 4 | Operador | TASK-032 ✅ | `task/033-detalhe-avaliacao` | 📝 Ordem pronta |
 | TASK-020…025 | Motor de IA + configuração de provedor | 3 | Operador | Fase 2 + escolha do primeiro adaptador de provedor | — | 💤 |
 | TASK-040…044 | Extensão de captura | E | Operador | Fase 4 + exemplo de URL/DOM do ClickDesk | — | 💤 |
 
