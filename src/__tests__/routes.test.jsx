@@ -56,6 +56,8 @@ describe('rotas internas', () => {
       expect(screen.getByRole('searchbox', { name: 'Buscar avaliações' })).toBeInTheDocument()
     } else if (path === '/nova-avaliacao') {
       expect(screen.getByRole('form', { name: 'Nova avaliação' })).toBeInTheDocument()
+    } else if (path === '/avaliacao/id-ficticio') {
+      expect(screen.getByText('Avaliação não encontrada ou você não tem acesso a ela.')).toBeInTheDocument()
     } else {
       expect(screen.getByText('Em construção.')).toBeInTheDocument()
     }
