@@ -7,7 +7,7 @@ Itens **Alterado** seguem a nova regra decidida pelo responsável (não a REF) e
 Status: ⬜ Não iniciado · 🟨 Em andamento · 🟦 Implementado (sem evidência) · ✅ Verificado · ⛔ Bloqueado
 REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 
-**Paridade atual comprovada: 37 / 102 itens (36,3%)**, com TASK-001 (PR #2), TASK-002 (PR #4), TASK-003 (PR #8), TASK-010 (PR #11), TASK-011 (PR #16), TASK-014 (PR #15), TASK-012 (PR #18), TASK-013 (PR #20), TASK-031 (PR #25), TASK-032 (PR #30) e TASK-033 (PR #34) mescladas. Parciais (🟨) não entram na contagem.
+**Paridade atual comprovada: 38 / 102 itens (37,3%)**, com TASK-001 (PR #2), TASK-002 (PR #4), TASK-003 (PR #8), TASK-010 (PR #11), TASK-011 (PR #16), TASK-014 (PR #15), TASK-012 (PR #18), TASK-013 (PR #20), TASK-031 (PR #25), TASK-032 (PR #30) TASK-033 (PR #34) e TASK-034 (PR #35) mescladas. Parciais (🟨) não entram na contagem.
 
 ## Fundação e visual
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
@@ -97,8 +97,8 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | P-17 | Detalhe: DiagnosisCard, CurationCard, CsatPanel | §7.4 | Funcional | Paridade | teste | 🟨 TASK-033 (PR #34): `EvaluationDetail.test.jsx`, `evaluationDetailServices.test.js`; faltam parecer do supervisor (TASK-036), CSAT manual e link de pesquisa |
 | P-18 | Detalhe: oportunidades com decisões do supervisor | §7.4 | Funcional | Paridade | teste | 🟨 TASK-033 (PR #34): `EvaluationDetail.test.jsx`, `evaluationDetailServices.test.js` (exibição das decisões); botões de decisão na TASK-036 |
 | P-19 | Detalhe não analisado: PrintGallery, editar/salvar transcrição, Analisar | §7.4 | Funcional | Paridade | teste | 🟨 TASK-033 (PR #34): `EvaluationDetail.test.jsx`, `evaluationDetailServices.test.js`; falta "Analisar com a IA" (Fase 3) |
-| P-20 | Curadoria: fila pendente + curadoria recente (10) | §7.5 | Funcional | Paridade | teste | ⬜ |
-| P-21 | Curadoria grava log por decisão | §7.4 | Funcional | Paridade | teste | 🟨 log atômico nas RPCs (PR #18); tela na Fase 4 |
+| P-20 | Curadoria: fila pendente + curadoria recente (10) | §7.5 | Funcional | Paridade | teste | ✅ TASK-034 (PR #35): `Curation.test.jsx`, `curation.test.js` |
+| P-21 | Curadoria grava log por decisão | §7.4 | Funcional | Paridade | teste | 🟨 log atômico nas RPCs (PR #18); formulários testados (PR #35); falta ligar ao detalhe (TASK-036) |
 | P-22 | Meu desenvolvimento: só itens com veredito efetivo positivo, 3 StatCards | §7.6 | Funcional | **Alterado D-011** | teste | ⬜ |
 | P-23 | Meu desenvolvimento: barras por competência, cartões por avaliação | §7.6 | Funcional | Paridade | teste | ⬜ |
 | P-24 | Satisfação: StatCards | §7.7 | Funcional | Paridade | teste | ⬜ |
