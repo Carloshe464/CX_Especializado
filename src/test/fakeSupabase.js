@@ -23,6 +23,7 @@ export function createFakeSupabase({ session = null, tables = {} } = {}) {
       const query = {
         select: vi.fn(() => query),
         insert: vi.fn(() => query),
+        update: vi.fn(() => query),
         single: vi.fn(async () => tables[table] ?? { data: null, error: null }),
         in: vi.fn(() => query),
         ilike: vi.fn(() => query),
@@ -36,6 +37,13 @@ export function createFakeSupabase({ session = null, tables = {} } = {}) {
       return query
     }),
     rpc: vi.fn(async () => ({ data: null, error: null })),
+    storage: {
+      from: vi.fn(() => ({
+        upload: vi.fn(async () => ({ data: { path: 'arquivo-ficticio' }, error: null })),
+        remove: vi.fn(async () => ({ data: [], error: null })),
+        createSignedUrl: vi.fn(async () => ({ data: { signedUrl: 'https://arquivos.exemplo.test/anexo' }, error: null })),
+      })),
+    },
     emit(event, nextSession) {
       listeners.forEach((listener) => listener(event, nextSession))
     },

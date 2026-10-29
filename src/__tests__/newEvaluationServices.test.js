@@ -55,7 +55,7 @@ it.each(['existente', null])('traduz 23505 e encontra somente a duplicata visív
 it('escapa curingas no ilike e confirma a igualdade por trim e caixa', async () => {
   mock.client.tables.evaluations = { data: [{ id: 'nao', protocol: 'prefixo A%_\\B' }, { id: 'sim', protocol: '  a%_\\b  ' }], error: null }
   await expect(findEvaluationIdByProtocol(' A%_\\B ')).resolves.toBe('sim')
-  expect(mock.client.from.mock.results[0].value.ilike).toHaveBeenCalledWith('protocol', '%a\\%\\_\\\\b%')
+  expect(mock.client.from.mock.results[0].value.ilike).toHaveBeenCalledWith('protocol', 'a\\%\\_\\\\b')
 })
 it.each([createEvaluation, findEvaluationIdByProtocol])('propaga erros de avaliação', async (action) => {
   const error = { code: '42501', message: 'Erro fictício' }

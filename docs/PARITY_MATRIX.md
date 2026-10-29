@@ -7,7 +7,7 @@ Itens **Alterado** seguem a nova regra decidida pelo responsável (não a REF) e
 Status: ⬜ Não iniciado · 🟨 Em andamento · 🟦 Implementado (sem evidência) · ✅ Verificado · ⛔ Bloqueado
 REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 
-**Paridade atual comprovada: 35 / 102 itens (34,3%)**, com TASK-001 (PR #2), TASK-002 (PR #4), TASK-003 (PR #8), TASK-010 (PR #11), TASK-011 (PR #16), TASK-014 (PR #15), TASK-012 (PR #18), TASK-013 (PR #20), TASK-031 (PR #25) e TASK-032 (PR #30) mescladas. Parciais (🟨) não entram na contagem.
+**Paridade atual comprovada: 37 / 102 itens (36,3%)**, com TASK-001 (PR #2), TASK-002 (PR #4), TASK-003 (PR #8), TASK-010 (PR #11), TASK-011 (PR #16), TASK-014 (PR #15), TASK-012 (PR #18), TASK-013 (PR #20), TASK-031 (PR #25), TASK-032 (PR #30) e TASK-033 (PR #34) mescladas. Parciais (🟨) não entram na contagem.
 
 ## Fundação e visual
 | ID | Requisito | REF | Tipo | Decisão | Verificação | Status |
@@ -91,12 +91,12 @@ REF = `docs/reference/BASE44_PLATAFORMA_PROTOCOLO_CX.md`
 | P-11 | Nova avaliação: aba prints (upload privado, extrair) | §7.3 | Funcional | Paridade | e2e | 🟨 TASK-032 (PR #30): upload privado no caminho D-025 testado e conferido no Studio local; falta "Extrair transcrição com IA" (Fase 3) |
 | P-12 | Nova avaliação: aba importar planilha | §7.3 | Funcional | Paridade | e2e | 🟨 TASK-032 (PR #30): aba presente e desabilitada; importação na Fase 5 |
 | P-13 | Nova avaliação: regras de `source` e `status` | §7.3 | Funcional | Paridade | teste | ✅ TASK-032 (PR #30): testes de `buildEvaluationPayload` |
-| P-14 | Detalhe: cabeçalho (kicker, título, linha meta, status, Reanalisar) | §7.4 | Visual/Func. | Paridade | screenshot + teste | ⬜ |
-| P-15 | Detalhe: 3 métricas | §7.4 | Funcional | Paridade | teste | ⬜ |
-| P-16 | Detalhe: Competências visíveis ao analista dono + controles de validação | §7.4 | Funcional | **Alterado D-011** | teste | ⬜ |
-| P-17 | Detalhe: DiagnosisCard, CurationCard, CsatPanel | §7.4 | Funcional | Paridade | teste | ⬜ |
-| P-18 | Detalhe: oportunidades com decisões do supervisor | §7.4 | Funcional | Paridade | teste | ⬜ |
-| P-19 | Detalhe não analisado: PrintGallery, editar/salvar transcrição, Analisar | §7.4 | Funcional | Paridade | teste | ⬜ |
+| P-14 | Detalhe: cabeçalho (kicker, título, linha meta, status, Reanalisar) | §7.4 | Visual/Func. | Paridade | screenshot + teste | 🟨 TASK-033 (PR #34): `EvaluationDetail.test.jsx`, `evaluationDetailServices.test.js`; falta "Reanalisar" (Fase 3) |
+| P-15 | Detalhe: 3 métricas | §7.4 | Funcional | Paridade | teste | ✅ TASK-033 (PR #34): `EvaluationDetail.test.jsx`, `evaluationDetailServices.test.js` ("Transcrição revisada" = há transcrição, regra provisória) |
+| P-16 | Detalhe: Competências visíveis ao analista dono + controles de validação | §7.4 | Funcional | **Alterado D-011** | teste | ✅ TASK-033 (PR #34): `EvaluationDetail.test.jsx`, `evaluationDetailServices.test.js`; RLS/RPC pelo pgTAP (PR #18) |
+| P-17 | Detalhe: DiagnosisCard, CurationCard, CsatPanel | §7.4 | Funcional | Paridade | teste | 🟨 TASK-033 (PR #34): `EvaluationDetail.test.jsx`, `evaluationDetailServices.test.js`; faltam parecer do supervisor (TASK-036), CSAT manual e link de pesquisa |
+| P-18 | Detalhe: oportunidades com decisões do supervisor | §7.4 | Funcional | Paridade | teste | 🟨 TASK-033 (PR #34): `EvaluationDetail.test.jsx`, `evaluationDetailServices.test.js` (exibição das decisões); botões de decisão na TASK-036 |
+| P-19 | Detalhe não analisado: PrintGallery, editar/salvar transcrição, Analisar | §7.4 | Funcional | Paridade | teste | 🟨 TASK-033 (PR #34): `EvaluationDetail.test.jsx`, `evaluationDetailServices.test.js`; falta "Analisar com a IA" (Fase 3) |
 | P-20 | Curadoria: fila pendente + curadoria recente (10) | §7.5 | Funcional | Paridade | teste | ⬜ |
 | P-21 | Curadoria grava log por decisão | §7.4 | Funcional | Paridade | teste | 🟨 log atômico nas RPCs (PR #18); tela na Fase 4 |
 | P-22 | Meu desenvolvimento: só itens com veredito efetivo positivo, 3 StatCards | §7.6 | Funcional | **Alterado D-011** | teste | ⬜ |

@@ -56,6 +56,8 @@ describe('rotas internas', () => {
       expect(screen.getByRole('searchbox', { name: 'Buscar avaliações' })).toBeInTheDocument()
     } else if (path === '/nova-avaliacao') {
       expect(screen.getByRole('form', { name: 'Nova avaliação' })).toBeInTheDocument()
+    } else if (path === '/avaliacao/id-ficticio') {
+      expect(screen.getByText('Avaliação não encontrada ou você não tem acesso a ela.')).toBeInTheDocument()
     } else if (path === '/curadoria') {
       expect(screen.getByRole('heading', { level: 2, name: /Em curadoria/ })).toBeInTheDocument()
     } else {
@@ -63,11 +65,11 @@ describe('rotas internas', () => {
     }
     expect(screen.getByRole('navigation', { name: 'Navegação principal (desktop)' })).toBeInTheDocument()
   })
-
   it('analista não acessa /curadoria e é redirecionado', async () => {
     renderAt('/curadoria', { ...supervisor, role: 'analista' })
     expect(await screen.findByRole('heading', { level: 1, name: 'Meu desenvolvimento' })).toBeInTheDocument()
   })
+
 })
 
 describe('rotas públicas', () => {
