@@ -242,7 +242,7 @@ it('CSAT vazio e limiar padrão', async () => {
   await screen.findByText('Nenhuma avaliação real do cliente registrada.')
 })
 it('galeria mostra imagem e PDF com URL assinada segura', async () => {
-  mocks.client.tables.evaluation_files = { data: [{ id: 'im', storage_path: 'org/av/im.png', kind: 'print' }, { id: 'pdf', storage_path: 'org/av/f.pdf', kind: 'pdf' }], error: null }
+  mocks.client.tables.evaluation_files = { data: [{ id: 'im', storage_path: 'org/av/im.png', kind: 'print' }, { id: 'pdf', storage_path: 'org/av/f.pdf', kind: 'pdf', created_by: 'a' }], error: null }
   show()
   const image = await screen.findByRole('img', { name: 'Anexo 1' })
   expect(image.parentElement).toHaveAttribute('target', '_blank')
@@ -250,8 +250,8 @@ it('galeria mostra imagem e PDF com URL assinada segura', async () => {
   expect(await screen.findByRole('link', { name: 'Abrir PDF 2' })).toHaveAttribute('href', 'https://arquivos.exemplo.test/anexo')
 })
 it.each([false, true])('remove anexo e trata erro do Storage: %s', async (fail) => {
-  mocks.client.tables.evaluation_files = { data: [{ id: 'pdf', storage_path: 'org/av/f.pdf', kind: 'pdf' }], error: null }
-  const remove = vi.fn(async () => ({ error: fail ? { code: '42501' } : null }))
+  mocks.client.tables.evaluation_files = { data: [{ id: 'pdf', storage_path: 'org/av/f.pdf', kind: 'pdf', created_by: 'a' }], error: null }
+  const remove = vi.fn(async () => ({ data: fail ? [] : [{ name: 'f.pdf' }], error: null }))
   mocks.client.storage.from.mockReturnValue({ createSignedUrl: vi.fn(async () => ({ data: { signedUrl: 'https://exemplo.test/pdf' } })), remove })
   const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true)
   const invalidate = vi.spyOn(queryClient, 'invalidateQueries')
@@ -260,11 +260,14 @@ it.each([false, true])('remove anexo e trata erro do Storage: %s', async (fail) 
   await user.click(await screen.findByRole('button', { name: 'Remover anexo 1' }))
   expect(confirm).toHaveBeenCalledWith('Remover este arquivo?')
   expect(remove).toHaveBeenCalledWith(['org/av/f.pdf'])
-  if (fail) expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível remover o arquivo.')
-  else expect(invalidate).toHaveBeenCalledWith({ queryKey: ['evaluation', id] })
+  if (fail) {
+    expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível remover o arquivo.')
+    expect(screen.getByRole('link', { name: 'Abrir PDF 1' })).toBeInTheDocument()
+    expect(invalidate).not.toHaveBeenCalled()
+  } else expect(invalidate).toHaveBeenCalledWith({ queryKey: ['evaluation', id] })
 })
 it('cancelar confirmação não remove', async () => {
-  mocks.client.tables.evaluation_files = { data: [{ id: 'pdf', storage_path: 'org/av/f.pdf', kind: 'pdf' }], error: null }
+  mocks.client.tables.evaluation_files = { data: [{ id: 'pdf', storage_path: 'org/av/f.pdf', kind: 'pdf', created_by: 'a' }], error: null }
   vi.spyOn(window, 'confirm').mockReturnValue(false)
   const user = userEvent.setup()
   show()
@@ -324,4 +327,28 @@ it('galeria oculta sem arquivos para estado sem edição', async () => {
   await screen.findByText('A última análise não foi concluída.')
   expect(screen.queryByRole('heading', { name: 'Anexos' })).not.toBeInTheDocument()
   expect(screen.queryByRole('heading', { name: 'Adicionar arquivos' })).not.toBeInTheDocument()
+})
+
+it('analista não vê Remover no arquivo enviado pelo supervisor', async () => {
+  mocks.client.tables.evaluation_files = { data: [
+    { id: 'supervisor-file', storage_path: 'org/av/supervisor.pdf', kind: 'pdf', created_by: 'supervisor' },
+    { id: 'own-file', storage_path: 'org/av/own.pdf', kind: 'pdf', created_by: 'a' },
+  ], error: null }
+  show()
+  await screen.findByRole('link', { name: 'Abrir PDF 1' })
+  expect(screen.queryByRole('button', { name: 'Remover anexo 1' })).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Remover anexo 2' })).toBeInTheDocument()
+})
+it.each([
+  ['supervisor', 'org-x', true],
+  ['supervisor', 'org-y', false],
+  ['platform_admin', null, true],
+  ['analista', 'org-x', false],
+])('%s em %s só recebe controle de gestor na organização correta: %s', async (role, organizationId, removable) => {
+  mocks.client.tables.evaluation_files = { data: [{ id: 'file', storage_path: 'org/av/f.pdf', kind: 'pdf', created_by: 'outro' }], error: null }
+  show({ role, organizationId, user: { id: 'gestor' } })
+  await screen.findByRole('link', { name: 'Abrir PDF 1' })
+  const button = screen.queryByRole('button', { name: 'Remover anexo 1' })
+  if (removable) expect(button).toBeInTheDocument()
+  else expect(button).not.toBeInTheDocument()
 })

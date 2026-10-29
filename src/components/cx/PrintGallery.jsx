@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useSession } from '@/auth/session'
 import { getEvaluationFileUrl, uploadEvaluationFile, removeEvaluationFile } from '@/services/evaluationFiles'
 import PrintFilesField from '@/components/cx/PrintFilesField'
 import { Button } from '@/components/ui/button'
@@ -26,12 +27,14 @@ function Attachment({ file, index, removable, busy, onRemove }) {
 }
 
 export default function PrintGallery({ evaluation, files }) {
+  const session = useSession()
   const [pendingFiles, setPendingFiles] = useState([])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
   const sending = useRef(false)
   const queryClient = useQueryClient()
   const editable = ['rascunho', 'transcrito'].includes(evaluation.status)
+  const manager = session.role === 'platform_admin' || (session.role === 'supervisor' && session.organizationId === evaluation.organization_id)
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['evaluation', evaluation.id] })
   async function upload() {
     if (sending.current || !pendingFiles.length) return
@@ -65,7 +68,7 @@ export default function PrintGallery({ evaluation, files }) {
   return (
     <section className="min-w-0 space-y-4 rounded-2xl border border-border bg-card p-5">
       {files.length > 0 && <><h2 className="font-heading text-xl font-semibold">Anexos</h2>
-        <ul className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3">{files.map((file, index) => <Attachment key={file.id} file={file} index={index} removable={editable} busy={busy} onRemove={remove} />)}</ul>
+        <ul className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3">{files.map((file, index) => <Attachment key={file.id} file={file} index={index} removable={editable && Boolean(session.user?.id) && (manager || file.created_by === session.user.id)} busy={busy} onRemove={remove} />)}</ul>
       </>}
       {editable && <div className="min-w-0 space-y-4"><h2 className="font-heading text-xl font-semibold">Adicionar arquivos</h2>
         <PrintFilesField files={pendingFiles} onChange={setPendingFiles} disabled={busy} />

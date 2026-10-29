@@ -113,16 +113,22 @@ it.each([
 it('lista arquivos com colunas explícitas e ordem', async () => {
   await expect(listEvaluationFiles(id)).resolves.toEqual([])
   const q = queryFor('evaluation_files')
-  expect(q.select).toHaveBeenCalledWith('id, storage_path, kind, mime_type, size_bytes, created_at')
+  expect(q.select).toHaveBeenCalledWith('id, storage_path, kind, mime_type, size_bytes, created_at, created_by')
   expect(q.eq).toHaveBeenCalledWith('evaluation_id', id)
   expect(q.order).toHaveBeenCalledWith('created_at')
 })
 it.each([false, true])('remove no Storage e propaga falha: %s', async (fail) => {
-  const remove = vi.fn(async () => ({ error: fail ? { code: '42501' } : null }))
+  const remove = vi.fn(async () => ({ data: fail ? null : [{ name: 'f.pdf' }], error: fail ? { code: '42501' } : null }))
   mock.client.storage.from.mockReturnValue({ remove })
   if (fail) await expect(removeEvaluationFile('org/av/f.pdf')).rejects.toEqual({ code: '42501' })
   else await expect(removeEvaluationFile('org/av/f.pdf')).resolves.toBeUndefined()
   expect(mock.client.storage.from).toHaveBeenCalledWith('evaluation-files')
+  expect(remove).toHaveBeenCalledExactlyOnceWith(['org/av/f.pdf'])
+})
+it.each([[], null, undefined])('recusa remoção sem objetos retornados: %s', async (data) => {
+  const remove = vi.fn(async () => ({ data, error: null }))
+  mock.client.storage.from.mockReturnValue({ remove })
+  await expect(removeEvaluationFile('org/av/f.pdf')).rejects.toThrow('Não foi possível remover o arquivo.')
   expect(remove).toHaveBeenCalledExactlyOnceWith(['org/av/f.pdf'])
 })
 it('escapa todos os curingas, sem curingas nas pontas e confirma igualdade', async () => {

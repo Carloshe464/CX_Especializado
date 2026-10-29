@@ -40,13 +40,14 @@ export async function getEvaluationFileUrl(path) {
 export async function listEvaluationFiles(evaluationId) {
   if (!supabase) throw new Error(supabaseConfigError || 'Configure o Supabase para acessar os arquivos das avaliações.')
   const { data, error } = await supabase.from('evaluation_files')
-    .select('id, storage_path, kind, mime_type, size_bytes, created_at')
+    .select('id, storage_path, kind, mime_type, size_bytes, created_at, created_by')
     .eq('evaluation_id', evaluationId).order('created_at')
   if (error) throw error
   return data ?? []
 }
 
 export async function removeEvaluationFile(path) {
-  const { error } = await storage().remove([path])
+  const { data, error } = await storage().remove([path])
   if (error) throw error
+  if (!data?.length) throw new Error('Não foi possível remover o arquivo.')
 }
