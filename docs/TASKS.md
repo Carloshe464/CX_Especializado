@@ -19,9 +19,9 @@ Status só muda com evidência (PR, CI, relatório do operador).
 | TASK-030 | Base da Fase 4: "Sair" no celular, páginas sob demanda, massa de dados local (`scripts/seed-local.mjs`) | 4 | Operador | TASK-015 ✅ · paralela à 031 | `task/030-base-fase4` | ✅ PR #26 |
 | TASK-031 | Tela Avaliações (`/avaliacoes`) | 4 | Operador | TASK-015 ✅ · paralela à 030 | `task/031-avaliacoes` | ✅ PR #25 |
 | TASK-032 | Tela Nova avaliação (`/nova-avaliacao`): analista travado/escolha pelo supervisor, abas, prints no Storage, protocolo duplicado | 4 | Operador | TASK-030 ✅ · TASK-031 ✅ | `task/032-nova-avaliacao` | ✅ PR #30 |
-| TASK-033 | Detalhe da avaliação (`/avaliacao/:id`): execução atual, anexos, transcrição editável, validação do analista (`submit_feedback`), curadoria em só leitura | 4 | Operador | TASK-032 ✅ | `task/033-detalhe-avaliacao` | 📝 Ordem pronta |
-| TASK-034 | Tela Curadoria (`/curadoria`): fila com prioridade "não útil", curadoria recente; formulários de decisão (`decide_opportunity`/`decide_diagnosis`) isolados | 4 | Operador | TASK-032 ✅ · **paralela à 033** (arquivos disjuntos) | `task/034-curadoria` | 📝 Ordem pronta |
-| TASK-036 | Ligar os formulários de decisão e a validação do supervisor ao detalhe | 4 | Operador | TASK-033 + TASK-034 mescladas | — | ⏳ A escrever |
+| TASK-033 | Detalhe da avaliação (`/avaliacao/:id`): execução atual, anexos, transcrição editável, validação do analista (`submit_feedback`), curadoria em só leitura | 4 | Operador | TASK-032 ✅ | `task/033-detalhe-avaliacao` | ✅ PR #34 |
+| TASK-034 | Tela Curadoria (`/curadoria`): fila com prioridade "não útil", curadoria recente; formulários de decisão (`decide_opportunity`/`decide_diagnosis`) isolados | 4 | Operador | TASK-032 ✅ · **paralela à 033** (arquivos disjuntos) | `task/034-curadoria` | 🔧 PR #35 (rascunho, sem lint/test/build executados) |
+| TASK-036 | Ligar os formulários de decisão e a validação do supervisor ao detalhe; **teste manual de ponta a ponta do detalhe herdado da TASK-033** | 4 | Operador | TASK-033 ✅ + TASK-034 mescladas | — | ⏳ A escrever |
 | TASK-020…025 | Motor de IA + configuração de provedor | 3 | Operador | Fase 2 + escolha do primeiro adaptador de provedor | — | 💤 |
 | TASK-040…044 | Extensão de captura | E | Operador | Fase 4 + exemplo de URL/DOM do ClickDesk | — | 💤 |
 
@@ -56,6 +56,8 @@ Status só muda com evidência (PR, CI, relatório do operador).
 - Job de limpeza de órfãos: precisa de função privilegiada própria (a view `private.orphan_evaluation_files` não é legível nem pelo `service_role`) (origem: revisão da TASK-013).
 - ~~Fase 4 (upload): arquivo de 0 byte e `contentType` pela extensão~~ — feito na TASK-032.
 - `findEvaluationIdByProtocol` usa `%termo%`; trocar pelo termo exato escapado (o PostgREST também trata `*` como curinga), para o link da duplicata não sumir com protocolos curtos acima do `max-rows`; unir os dois imports de `lib/cx.js` em `evaluations.js` (origem: revisão da TASK-032).
+- Cores fixas do Tailwind (`emerald`/`amber`/`red`/`sky`) em `CurationCard` e `OpportunityCard`; trocar por tokens (origem: revisão da TASK-033).
+- ~~`findEvaluationIdByProtocol` com `%termo%`~~ — feito na TASK-033.
 - Capturas de tela dos operadores ficam só no computador local; definir como anexá-las ao PR (origem: revisões das TASK-031/032).
 - SEC-21 (LGPD): rever a exclusão de arquivos pelo gestor após a análise junto da política de retenção.
 
@@ -69,6 +71,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 ## Registro de revisões
 | Tarefa | PR | Commit revisado | Resultado | Evidência |
 |---|---|---|---|---|
+| TASK-033 | #34 | `7b1eb2d` | ✅ Aprovada (2ª rodada): remoção silenciosa de anexo corrigida (`data` vazio = erro; "Remover" só para gestor ou quem enviou); leitura só da execução atual com colunas explícitas; validação só do analista dono; busca de duplicata exata. **Teste manual no Supabase local não feito** (disco cheio no ambiente do operador): aceito porque a PR não muda banco e a RLS está coberta pelo pgTAP; vira obrigatório na TASK-036 | saídas locais (lint 0, 515 testes, build), capturas sintéticas não anexadas |
 | TASK-032 | #30 | `92c2262` | ✅ Aprovada: payload só com as 8 colunas concedidas; analista travado/escolha pelo supervisor (D-013); duplicidade sem perder o texto (D-012); anexos no caminho D-025; desvio temporário (criação só com prints) aceito; P-11/P-12 🟨 | saídas locais (lint 0, 433 testes, build), manual local com supervisor/A/B e 2 linhas em `evaluation_files` |
 | TASK-031 | #25 | `0f3193a` | ✅ Aprovada (2ª rodada): limiar CSAT por organização (`getCsatThresholds()` → mapa; inválido → 4); `organizationId` exposto; exceção em `routes.test.jsx` aceita; P-08 🟨 até a importação (Fase 5) | saídas locais (lint 0, 391 testes, build com chunk `Evaluations` 16,76 kB), teste de regressão com 3 organizações, teste manual local com 2 perfis |
 | TASK-031 | #25 | `6556090` | 🔧 Correção pedida: `getCsatThreshold().maybeSingle()` quebra para o admin da plataforma (lê `app_settings` de várias organizações); limiar deve ser por organização da avaliação; merge da `main` (lazy) | revisão do diff + política `app_settings_select` |
