@@ -21,7 +21,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 | TASK-032 | Tela Nova avaliação (`/nova-avaliacao`): analista travado/escolha pelo supervisor, abas, prints no Storage, protocolo duplicado | 4 | Operador | TASK-030 ✅ · TASK-031 ✅ | `task/032-nova-avaliacao` | ✅ PR #30 |
 | TASK-033 | Detalhe da avaliação (`/avaliacao/:id`): execução atual, anexos, transcrição editável, validação do analista (`submit_feedback`), curadoria em só leitura | 4 | Operador | TASK-032 ✅ | `task/033-detalhe-avaliacao` | ✅ PR #34 |
 | TASK-034 | Tela Curadoria (`/curadoria`): fila com prioridade "não útil", curadoria recente; formulários de decisão (`decide_opportunity`/`decide_diagnosis`) isolados | 4 | Operador | TASK-032 ✅ · **paralela à 033** (arquivos disjuntos) | `task/034-curadoria` | ✅ PR #35 |
-| TASK-036 | Ligar os formulários de decisão e a validação do supervisor ao detalhe; **teste manual de ponta a ponta herdado das TASK-033 e 034** | 4 | Operador | TASK-033 ✅ + TASK-034 ✅ | — | ⏳ A escrever |
+| TASK-036 | Ligar os formulários de decisão e a validação do supervisor ao detalhe; **teste manual de ponta a ponta herdado das TASK-033 e 034** | 4 | Operador | TASK-033 ✅ + TASK-034 ✅ · exige Supabase local + Node 24 + push | `task/036-curadoria-no-detalhe` | 📝 Ordem pronta |
 | TASK-020…025 | Motor de IA + configuração de provedor | 3 | Operador | Fase 2 + escolha do primeiro adaptador de provedor | — | 💤 |
 | TASK-040…044 | Extensão de captura | E | Operador | Fase 4 + exemplo de URL/DOM do ClickDesk | — | 💤 |
 
@@ -37,7 +37,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 
 ## Ordem de execução da Fase 4
 1. ✅ TASK-030 (base) · ✅ TASK-031 (Avaliações) · ✅ TASK-032 (Nova avaliação).
-2. **Agora:** TASK-033 Detalhe com validação do analista ∥ TASK-034 Curadoria (em paralelo) → TASK-036 integração da curadoria no detalhe → TASK-035 Meu desenvolvimento.
+2. ✅ TASK-033 Detalhe ∥ ✅ TASK-034 Curadoria → **Agora:** TASK-036 curadoria no detalhe + teste de ponta a ponta → TASK-035 Meu desenvolvimento.
 3. Sem IA (Fase 3 no final): telas de análise são construídas e testadas com análises fictícias da massa local.
 
 ## Backlog identificado em revisões
@@ -56,7 +56,7 @@ Status só muda com evidência (PR, CI, relatório do operador).
 - Job de limpeza de órfãos: precisa de função privilegiada própria (a view `private.orphan_evaluation_files` não é legível nem pelo `service_role`) (origem: revisão da TASK-013).
 - ~~Fase 4 (upload): arquivo de 0 byte e `contentType` pela extensão~~ — feito na TASK-032.
 - `findEvaluationIdByProtocol` usa `%termo%`; trocar pelo termo exato escapado (o PostgREST também trata `*` como curinga), para o link da duplicata não sumir com protocolos curtos acima do `max-rows`; unir os dois imports de `lib/cx.js` em `evaluations.js` (origem: revisão da TASK-032).
-- Cores fixas do Tailwind (`emerald`/`amber`/`red`/`sky`) em `CurationCard` e `OpportunityCard`; trocar por tokens (origem: revisão da TASK-033).
+- Cores fixas em `CurationCard`, `OpportunityCard` e `Curation.jsx`: centralizar em `cx.js` na TASK-036 (origem: revisões das TASK-033/034).
 - ~~`findEvaluationIdByProtocol` com `%termo%`~~ — feito na TASK-033.
 - Capturas de tela dos operadores ficam só no computador local; definir como anexá-las ao PR (origem: revisões das TASK-031/032).
 - SEC-21 (LGPD): rever a exclusão de arquivos pelo gestor após a análise junto da política de retenção.
