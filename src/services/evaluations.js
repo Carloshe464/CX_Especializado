@@ -1,6 +1,5 @@
 import { supabase, supabaseConfigError } from '../lib/supabaseClient.js'
-import { DEFAULT_CSAT_THRESHOLD } from '../lib/cx.js'
-import { CHANNELS } from '../lib/cx.js'
+import { CHANNELS, DEFAULT_CSAT_THRESHOLD } from '../lib/cx.js'
 
 function client() {
   if (!supabase) throw new Error(supabaseConfigError || 'Configure o Supabase para acessar as avaliações.')
@@ -68,7 +67,7 @@ export function buildEvaluationPayload({ form, session, analyst, hasPrints }) {
 
 export async function findEvaluationIdByProtocol(protocol, organizationId) {
   const normalized = protocol.trim().toLowerCase()
-  const pattern = `%${normalized.replace(/[\\%_]/g, '\\$&')}%`
+  const pattern = normalized.replace(/[\\%_*]/g, '\\$&')
   let query = client().from('evaluations').select('id, protocol').ilike('protocol', pattern)
   // O admin pode ler várias organizações; a busca de uma duplicata pertence à criação atual.
   if (organizationId) query = query.eq('organization_id', organizationId)
@@ -90,4 +89,19 @@ export async function createEvaluation(payload) {
   }
   if (error) throw error
   return { id: data.id, organizationId: data.organization_id }
+}
+
+export async function updateEvaluationTranscript({ id, transcript }) {
+  const hasText = Boolean(transcript?.trim())
+  const { data, error } = await client().from('evaluations')
+    .update({ transcript: hasText ? transcript : null, status: hasText ? 'transcrito' : 'rascunho' })
+    .eq('id', id).select('id').single()
+  if (error?.code === 'CX033' || error?.code === 'CX036') {
+    throw new Error('A transcrição não pode mais ser alterada nesta etapa.')
+  }
+  if (error?.code === '42501' || error?.code === 'PGRST116' || (!error && !data)) {
+    throw new Error('Você não tem permissão para alterar esta avaliação.')
+  }
+  if (error) throw new Error('Não foi possível salvar a transcrição. Tente novamente.')
+  return data
 }
