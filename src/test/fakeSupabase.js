@@ -28,6 +28,7 @@ export function createFakeSupabase({ session = null, tables = {} } = {}) {
         in: vi.fn(() => query),
         ilike: vi.fn(() => query),
         eq: vi.fn(() => query),
+        or: vi.fn(() => query),
         order: vi.fn(() => query),
         limit: vi.fn(() => query),
         then: (resolve, reject) => Promise.resolve(tables[table] ?? { data: [], error: null }).then(resolve, reject),
