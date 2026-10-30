@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '@/auth/session'
+import { isOrgManager } from '@/lib/permissions'
 import { getEvaluationFileUrl, uploadEvaluationFile, removeEvaluationFile } from '@/services/evaluationFiles'
 import PrintFilesField from '@/components/cx/PrintFilesField'
 import { Button } from '@/components/ui/button'
@@ -34,7 +35,7 @@ export default function PrintGallery({ evaluation, files }) {
   const sending = useRef(false)
   const queryClient = useQueryClient()
   const editable = ['rascunho', 'transcrito'].includes(evaluation.status)
-  const manager = session.role === 'platform_admin' || (session.role === 'supervisor' && session.organizationId === evaluation.organization_id)
+  const manager = isOrgManager(session, evaluation.organization_id)
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['evaluation', evaluation.id] })
   async function upload() {
     if (sending.current || !pendingFiles.length) return
