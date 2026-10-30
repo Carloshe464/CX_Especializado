@@ -5,6 +5,7 @@ import { useSession } from '@/auth/session'
 import { getEvaluationDetail } from '@/services/evaluationDetail'
 import { getCsatThresholds, updateEvaluationTranscript } from '@/services/evaluations'
 import { average, BADGE_BASE, COMPETENCIES, formatDate, formatDecimal, STATUS_LABELS, STATUS_STYLES } from '@/lib/cx'
+import { isOrgManager } from '@/lib/permissions'
 import { cn } from '@/lib/utils'
 import LoadingSpinner from '@/components/cx/LoadingSpinner'
 import StatCard from '@/components/cx/StatCard'
@@ -13,6 +14,8 @@ import DiagnosisCard from '@/components/cx/DiagnosisCard'
 import CurationCard from '@/components/cx/CurationCard'
 import OpportunityCard from '@/components/cx/OpportunityCard'
 import AnalystValidation from '@/components/cx/AnalystValidation'
+import OpportunityDecisionForm from '@/components/cx/OpportunityDecisionForm'
+import DiagnosisDecisionForm from '@/components/cx/DiagnosisDecisionForm'
 import PrintGallery from '@/components/cx/PrintGallery'
 import CsatRecordList from '@/components/cx/CsatRecordList'
 import { Button } from '@/components/ui/button'
@@ -27,7 +30,7 @@ function Transcript({ evaluation }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
   const sending = useRef(false)
-  const manager = session.role === 'platform_admin' || (session.role === 'supervisor' && session.organizationId === evaluation.organization_id)
+  const manager = isOrgManager(session, evaluation.organization_id)
   const editable = ['rascunho', 'transcrito'].includes(evaluation.status) && Boolean(session.user?.id) &&
     (manager || evaluation.created_by === session.user.id || evaluation.analyst_user_id === session.user.id)
   async function save() {
@@ -60,6 +63,7 @@ function Transcript({ evaluation }) {
 
 export default function EvaluationDetail() {
   const { id } = useParams()
+  const session = useSession()
   const detail = useQuery({ queryKey: ['evaluation', id], queryFn: () => getEvaluationDetail(id) })
   const thresholds = useQuery({ queryKey: ['app_settings', 'csat_positive_threshold'], queryFn: getCsatThresholds })
   if (detail.isPending) return <LoadingSpinner />
@@ -69,6 +73,7 @@ export default function EvaluationDetail() {
   const threshold = thresholds.data?.[evaluation.organization_id] ?? 4
   const mean = average(scores.map(({ score }) => score))
   const analyzed = run?.status === 'sucesso'
+  const manager = isOrgManager(session, evaluation.organization_id)
   const meta = [evaluation.analyst_name && `Analista ${evaluation.analyst_name}`, evaluation.channel, evaluation.created_at && formatDate(evaluation.created_at)].filter(Boolean).join(' · ')
   const validation = (target, opportunityId = null) => <AnalystValidation evaluation={evaluation} runId={run.id} target={target} opportunityId={opportunityId} feedback={feedback} />
   return (
@@ -92,12 +97,17 @@ export default function EvaluationDetail() {
           </section>
           <div className="min-w-0 space-y-6">
             <DiagnosisCard run={run}>{validation('diagnostico')}</DiagnosisCard>
-            <CurationCard evaluation={evaluation} />
+            <CurationCard evaluation={evaluation}>
+              {manager && <DiagnosisDecisionForm evaluation={{ id: evaluation.id, status: evaluation.status, diagnosisStatus: evaluation.diagnosis_status }} />}
+            </CurationCard>
             <section className="min-w-0 space-y-4"><h2 className="font-heading text-xl font-semibold">Satisfação real</h2><CsatRecordList records={csatRecords} threshold={threshold} /></section>
           </div>
         </div>
         <section className="min-w-0 space-y-4"><h2 className="font-heading text-xl font-semibold">Oportunidades de melhoria</h2>
-          {opportunities.length ? opportunities.map((opportunity) => <OpportunityCard key={opportunity.id} opportunity={opportunity}>{validation('oportunidade', opportunity.id)}</OpportunityCard>) : <p className="rounded-2xl border border-dashed border-border p-5 text-sm text-muted-foreground">A IA não identificou oportunidades relevantes neste atendimento.</p>}
+          {opportunities.length ? opportunities.map((opportunity) => <OpportunityCard key={opportunity.id} opportunity={opportunity}>
+            {manager && <OpportunityDecisionForm opportunity={opportunity} evaluationId={evaluation.id} />}
+            {validation('oportunidade', opportunity.id)}
+          </OpportunityCard>) : <p className="rounded-2xl border border-dashed border-border p-5 text-sm text-muted-foreground">A IA não identificou oportunidades relevantes neste atendimento.</p>}
         </section>
       </> : <>
         {run?.status === 'em_andamento' && <p role="status">A análise está em andamento.</p>}

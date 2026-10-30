@@ -6,7 +6,7 @@ import EmptyState from '@/components/cx/EmptyState'
 import LoadingSpinner from '@/components/cx/LoadingSpinner'
 import CurationQueueItem from '@/components/cx/CurationQueueItem'
 import { Button } from '@/components/ui/button'
-import { BADGE_BASE, DIAGNOSIS_LABELS, formatDate } from '@/lib/cx'
+import { BADGE_BASE, DIAGNOSIS_LABELS, DIAGNOSIS_STYLES, formatDate } from '@/lib/cx'
 import { cn } from '@/lib/utils'
 import { listCurationQueue, listRecentCuration } from '@/services/curation'
 
@@ -62,9 +62,7 @@ function RecentContent({ query }) {
               </span>
             </span>
             {diagnosisStatus && (
-              <span className={cn(BADGE_BASE, diagnosisStatus === 'aprovado'
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                : 'border-destructive/40 bg-destructive/10 text-destructive')}>
+              <span className={cn(BADGE_BASE, DIAGNOSIS_STYLES[diagnosisStatus])}>
                 {DIAGNOSIS_LABELS[diagnosisStatus] ?? diagnosisStatus}
               </span>
             )}

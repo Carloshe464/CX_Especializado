@@ -69,6 +69,17 @@ export const STATUS_STYLES = Object.freeze({
   analisado: 'bg-amber-50 text-amber-800 border-amber-200',
   curado: 'bg-emerald-50 text-emerald-800 border-emerald-200',
 })
+export const DIAGNOSIS_STYLES = Object.freeze({
+  pendente: 'bg-amber-50 text-amber-800 border-amber-200',
+  aprovado: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+  rejeitado: 'bg-red-50 text-red-800 border-red-200',
+})
+export const OPPORTUNITY_DECISION_STYLES = Object.freeze({
+  aprovada: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+  ajustada: 'bg-sky-50 text-sky-800 border-sky-200',
+  rejeitada: 'bg-red-50 text-red-800 border-red-200',
+})
+export const OPPORTUNITY_DECISION_LABELS = Object.freeze({ aprovada: 'Aprovada', ajustada: 'Ajustada', rejeitada: 'Rejeitada' })
 
 const NOT_EVALUABLE = 'Não avaliável'
 
