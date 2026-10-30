@@ -209,12 +209,13 @@ it.each([['CX023', 'Você não tem permissão para validar esta avaliação.'], 
   expect(await form.findByRole('alert')).toHaveTextContent(message)
   expect(form.getByRole('textbox')).toHaveValue('Comentário fictício')
 })
-it.each([false, true])('supervisor vê validação em leitura; existente %s', async (present) => {
+it.each([false, true])('supervisor vê validação do analista em leitura; existente %s', async (present) => {
   analyzed()
   mocks.client.tables.analysis_feedback = { data: present ? [feedback] : [], error: null }
   show({ ...analyst, role: 'supervisor', user: { id: 'supervisor' } })
   await screen.findByRole('heading', { name: 'Diagnóstico da IA' })
-  expect(screen.queryByRole('form')).not.toBeInTheDocument()
+  expect(screen.queryByRole('form', { name: /^Validação/ })).not.toBeInTheDocument()
+  expect(screen.getByRole('form', { name: 'Sua avaliação do diagnóstico' })).toBeInTheDocument()
   if (present) {
     expect(screen.getByText('Validação do analista: Não gostei · Útil')).toBeInTheDocument()
     expect(screen.getByText('Comentário fictício')).toBeInTheDocument()
@@ -297,14 +298,14 @@ it('CSAT sem configuração usa o limiar padrão 4', async () => {
   await screen.findByText('Satisfação positiva')
   expect(screen.queryByText(/nota derivada/)).not.toBeInTheDocument()
 })
-it('admin vê validação somente leitura e diagnóstico rejeitado', async () => {
+it('admin vê validação do analista em leitura e diagnóstico rejeitado', async () => {
   analyzed()
   mocks.client.tables.evaluations.data.diagnosis_status = 'rejeitado'
   mocks.client.tables.analysis_feedback = { data: [{ ...feedback, liked: true, useful: false }], error: null }
   show({ ...analyst, role: 'platform_admin', organizationId: null })
   await screen.findByText('Rejeitado')
   expect(screen.getByText('Validação do analista: Gostei · Não útil')).toBeInTheDocument()
-  expect(screen.queryByRole('form')).not.toBeInTheDocument()
+  expect(screen.queryByRole('form', { name: /^Validação/ })).not.toBeInTheDocument()
 })
 it('envio de validação fica desabilitado durante a RPC', async () => {
   analyzed()
